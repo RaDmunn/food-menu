@@ -1,0 +1,74 @@
+  @use "../_variables.scss" as *;
+  
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 4rem 8%;
+    background: $Main-bg;
+
+    &__content {
+      max-width: 500px;
+    }
+
+    &__title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: $Title-color;
+      margin-bottom: 1rem;
+
+      span {
+        color: $Main-red;
+      }
+    }
+
+    &__subtitle {
+      font-size: 1.2rem;
+      color: $Text-color;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    &__buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    &__image {
+      text-align: right;
+
+      img {
+        max-width: 100%;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+    }
+  }
+
+  // кнопки
+  .btn {
+    padding: 0.8rem 1.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 2rem;
+    text-decoration: none;
+    transition: 0.3s ease;
+
+    &--primary {
+      background: $Main-red;
+      color: $White-color;
+
+     
+    }
+
+    &--secondary {
+      background: transparent;
+      border: 2px solid $Main-red;
+      color: $Main-red;
+
+      &:hover {
+        background: $Main-red;
+        color: $White-color;
+      }
+    }
+  }
