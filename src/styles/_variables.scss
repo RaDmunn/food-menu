@@ -1,7 +1,68 @@
-$Main-font: 'Poppins';       // основной шрифт
-$Title-color: #2A2D2A;       // цвет заголовков
-$Text-color: #424642;        // цвет обычного текста
-$Main-red: #D92B09;           // основной красный цвет
-$White-color: #fff;           // белый цвет
-$Main-green: #479E58;         // основной зелёный цвет (пока не используется в коде)
-$Main-bg: #f9f9f9;            // фоновый цвет для секции
+@font-face {
+  font-family: "Montserrat";
+  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SourceSans3";
+  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+// Fonts
+$Title-font: "Montserrat", sans-serif;
+$Main-font: "SourceSans3", sans-serif;
+
+// Color Palette for Food & Restaurant Theme
+// Primary Colors - Warm and appetizing
+$primary-orange: #ff6b35;        // Vibrant orange - main brand color
+$primary-orange-light: #ff8c5a;  // Lighter orange for hover states
+$primary-orange-dark: #e55a2b;   // Darker orange for active states
+
+// Secondary Colors - Earthy and natural
+$secondary-green: #2d5016;       // Deep forest green - natural, fresh
+$secondary-green-light: #4a7c59; // Lighter green for accents
+$secondary-cream: #faf7f2;       // Warm cream - background color
+
+// Accent Colors
+$accent-red: #d32f2f;           // Rich red for special offers, spicy items
+$accent-yellow: #ffc107;        // Golden yellow for ratings, highlights
+$accent-brown: #8d6e63;         // Warm brown for coffee, chocolate items
+
+// Neutral Colors
+$neutral-white: #ffffff;
+$neutral-light-gray: #f5f5f5;
+$neutral-gray: #9e9e9e;
+$neutral-dark-gray: #424242;
+$neutral-black: #212121;
+
+// Text Colors
+$text-primary: #212121;
+$text-secondary: #424242;
+$text-muted: #9e9e9e;
+$text-light: #ffffff;
+
+// Background Colors
+$bg-primary: #ffffff;
+$bg-secondary: #faf7f2;
+$bg-dark: #2d5016;
+
+// Border Colors
+$border-light: #e0e0e0;
+$border-medium: #bdbdbd;
+$border-dark: #424242;
+
+// Status Colors
+$success: #4caf50;
+$warning: #ffc107;
+$error: #d32f2f;
+$info: #2196f3;
+
+// Breakpoints
+$mobile: 480px;
+$tablet: 768px;
+$desktop: 1024px;
+$large-desktop: 1200px;
