@@ -2,6 +2,7 @@
 @use "mixins";
 @use "reset";
 @use "./main_page/hero.scss";
+@use "features";
 
 * {
   box-sizing: border-box;
