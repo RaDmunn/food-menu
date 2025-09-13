@@ -1,37 +1,42 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
-import { Store, Menu, Star, MapPin } from 'lucide-react';
+import React, { useRef } from "react";
+import { Store, Menu, Star, MapPin } from "lucide-react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 const features = [
   {
     id: 1,
     title: "Restaurant Directory",
-    description: "Comprehensive database of restaurants with detailed information about cuisine, atmosphere, and specialties",
+    description:
+      "Comprehensive database of restaurants with detailed information about cuisine, atmosphere, and specialties",
     icon: Store,
-    side: "left"
+    side: "left",
   },
   {
     id: 2,
     title: "Live Menus",
-    description: "Always up-to-date menus with prices, dish descriptions, and ingredient information",
+    description:
+      "Always up-to-date menus with prices, dish descriptions, and ingredient information",
     icon: Menu,
-    side: "right"
+    side: "right",
   },
   {
     id: 3,
     title: "Authentic Reviews",
-    description: "Real customer reviews with food photos and detailed dining experiences",
+    description:
+      "Real customer reviews with food photos and detailed dining experiences",
     icon: Star,
-    side: "left"
+    side: "left",
   },
   {
     id: 4,
     title: "Real-time Info",
-    description: "Opening hours, contacts, promotions and special offers updated in real-time",
+    description:
+      "Opening hours, contacts, promotions and special offers updated in real-time",
     icon: MapPin,
-    side: "right"
-  }
+    side: "right",
+  },
 ];
 
 const leftTrayDishes = [
@@ -39,7 +44,7 @@ const leftTrayDishes = [
   { name: "Салат", image: "🥗", rotation: 25, x: 60, y: 20 },
   { name: "Паста", image: "🍝", rotation: -10, x: 40, y: 60 },
   { name: "Суп", image: "🍲", rotation: 20, x: 70, y: 50 },
-  { name: "Хлеб", image: "🥖", rotation: -30, x: 15, y: 70 }
+  { name: "Хлеб", image: "🥖", rotation: -30, x: 15, y: 70 },
 ];
 
 const rightTrayDishes = [
@@ -47,38 +52,62 @@ const rightTrayDishes = [
   { name: "Бургер", image: "🍔", rotation: -20, x: 65, y: 35 },
   { name: "Десерт", image: "🍰", rotation: 30, x: 45, y: 65 },
   { name: "Кофе", image: "☕", rotation: -25, x: 20, y: 55 },
-  { name: "Вино", image: "🍷", rotation: 10, x: 75, y: 60 }
+  { name: "Вино", image: "🍷", rotation: 10, x: 75, y: 60 },
 ];
 
 export default function FeaturesSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const leftTrayRef = useRef<HTMLDivElement>(null);
-  const rightTrayRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current || !leftTrayRef.current || !rightTrayRef.current) return;
+  // Отслеживание скролла для секции
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 100%", "end 0%"],
+  });
 
-      const rect = sectionRef.current.getBoundingClientRect();
-      const scrollProgress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (window.innerHeight + rect.height)));
+  // Анимация выдвижения подносов со сторон при входе в секцию и задвигания при выходе
+  // Левый поднос: выдвигается в поле зрения пользователя (частично видимый)
+  const leftTrayX = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.65, 1],
+    [0, 35, 35, 0]
+  );
+  const rightTrayX = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.65, 1],
+    [0, -35, -35, 0]
+  );
 
-      // Только легкое движение подносов без вращения
-      const leftY = scrollProgress * 50;
-      const rightY = -scrollProgress * 40;
+  // Вращение подносов при скролле - плавное непрерывное вращение
+  const leftTrayRotate = useTransform(scrollYProgress, [0, 1], [0, 360]); // 1 полный оборот
+  const rightTrayRotate = useTransform(scrollYProgress, [0, 1], [0, -360]); // 1 полный оборот в обратную сторону
 
-      leftTrayRef.current.style.transform = `translateY(${leftY}px)`;
-      rightTrayRef.current.style.transform = `translateY(${rightY}px)`;
-    };
+  // Opacity для плавного появления/исчезновения - исчезают раньше
+  const trayOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.15, 0.65, 0.8],
+    [0, 1, 1, 0]
+  );
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Добавляем пружинную анимацию для плавности
+  const springConfig = { stiffness: 80, damping: 25, restDelta: 0.001 };
+  const leftTrayXSpring = useSpring(leftTrayX, springConfig);
+  const rightTrayXSpring = useSpring(rightTrayX, springConfig);
+  const leftTrayRotateSpring = useSpring(leftTrayRotate, springConfig);
+  const rightTrayRotateSpring = useSpring(rightTrayRotate, springConfig);
+  const trayOpacitySpring = useSpring(trayOpacity, springConfig);
 
   return (
     <section ref={sectionRef} className="features-section">
       {/* Левый поднос */}
       <div className="tray tray--left">
-        <div ref={leftTrayRef} className="tray__container">
+        <motion.div
+          className="tray__container"
+          style={{
+            x: leftTrayXSpring,
+            rotate: leftTrayRotateSpring,
+            opacity: trayOpacitySpring,
+          }}
+        >
           <div className="tray__plate">
             {leftTrayDishes.map((dish, index) => (
               <div
@@ -88,19 +117,26 @@ export default function FeaturesSection() {
                   left: `${dish.x}%`,
                   top: `${dish.y}%`,
                   transform: `rotate(${dish.rotation}deg)`,
-                  animationDelay: `${index * 0.2}s`
+                  animationDelay: `${index * 0.2}s`,
                 }}
               >
                 <span className="dish__emoji">{dish.image}</span>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Правый поднос */}
       <div className="tray tray--right">
-        <div ref={rightTrayRef} className="tray__container">
+        <motion.div
+          className="tray__container"
+          style={{
+            x: rightTrayXSpring,
+            rotate: rightTrayRotateSpring,
+            opacity: trayOpacitySpring,
+          }}
+        >
           <div className="tray__plate">
             {rightTrayDishes.map((dish, index) => (
               <div
@@ -110,20 +146,24 @@ export default function FeaturesSection() {
                   left: `${dish.x}%`,
                   top: `${dish.y}%`,
                   transform: `rotate(${dish.rotation}deg)`,
-                  animationDelay: `${index * 0.2}s`
+                  animationDelay: `${index * 0.2}s`,
                 }}
               >
                 <span className="dish__emoji">{dish.image}</span>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Центральный роадмеп */}
       <div className="roadmap">
         <div className="roadmap__path">
-          <svg className="roadmap__line" viewBox="0 0 400 800" preserveAspectRatio="none">
+          <svg
+            className="roadmap__line"
+            viewBox="0 0 400 800"
+            preserveAspectRatio="none"
+          >
             <path
               d="M200 0 Q300 100 200 200 Q100 300 200 400 Q300 500 200 600 Q100 700 200 800"
               stroke="url(#gradient)"
@@ -154,7 +194,9 @@ export default function FeaturesSection() {
               </div>
               <div className="feature-card__content">
                 <h3 className="feature-card__title">{feature.title}</h3>
-                <p className="feature-card__description">{feature.description}</p>
+                <p className="feature-card__description">
+                  {feature.description}
+                </p>
               </div>
               <div className="feature-card__number">{feature.id}</div>
             </div>
