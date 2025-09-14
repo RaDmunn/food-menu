@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export default function Hero() {
   return (
@@ -7,9 +7,7 @@ export default function Hero() {
         <h1 className="hero__title">
           <span className="hero__title-main">DOMAIN</span>
         </h1>
-        <p className="hero__subtitle">
-          Where culinary stories begin
-        </p>
+        <p className="hero__subtitle">Where culinary stories begin</p>
       </div>
     </section>
   );

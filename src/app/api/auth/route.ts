@@ -96,10 +96,8 @@ export async function POST(request: NextRequest) {
     }
   } catch (error: unknown) {
     console.error("Auth API error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

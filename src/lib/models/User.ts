@@ -135,4 +135,5 @@ UserSchema.statics.findByRole = function (role: UserRole) {
 };
 
 // Export model with proper check
-export default (mongoose.models.User || mongoose.model<IUser, IUserModel>("User", UserSchema)) as IUserModel;
+export default (mongoose.models.User ||
+  mongoose.model<IUser, IUserModel>("User", UserSchema)) as IUserModel;

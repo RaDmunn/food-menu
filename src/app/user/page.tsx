@@ -153,7 +153,9 @@ export default function UserPage() {
             <button
               onClick={() => setActiveTab("restaurants")}
               className={`user-dashboard__nav-tab ${
-                activeTab === "restaurants" ? "user-dashboard__nav-tab--active" : ""
+                activeTab === "restaurants"
+                  ? "user-dashboard__nav-tab--active"
+                  : ""
               }`}
             >
               My Restaurants
@@ -170,7 +172,9 @@ export default function UserPage() {
             <button
               onClick={() => setActiveTab("settings")}
               className={`user-dashboard__nav-tab ${
-                activeTab === "settings" ? "user-dashboard__nav-tab--active" : ""
+                activeTab === "settings"
+                  ? "user-dashboard__nav-tab--active"
+                  : ""
               }`}
             >
               Settings
@@ -189,21 +193,15 @@ export default function UserPage() {
                   <h2>Your Restaurants</h2>
                   <p>Manage your restaurant locations and details</p>
                 </div>
-                <button className="add-btn">
-                  Add New Restaurant
-                </button>
+                <button className="add-btn">Add New Restaurant</button>
               </div>
 
               {restaurants.length === 0 ? (
                 <div className="user-dashboard__empty">
-                  <div className="user-dashboard__empty-icon">
-                    R
-                  </div>
+                  <div className="user-dashboard__empty-icon">R</div>
                   <h3>No restaurants yet</h3>
                   <p>Get started by adding your first restaurant</p>
-                  <button className="add-btn">
-                    Add Restaurant
-                  </button>
+                  <button className="add-btn">Add Restaurant</button>
                 </div>
               ) : (
                 <div className="user-dashboard__restaurant-grid">
@@ -236,15 +234,16 @@ export default function UserPage() {
                           {restaurant.status}
                         </span>
                         <span className="user-dashboard__restaurant-card-location">
-                          {restaurant.address.city}, {restaurant.address.country}
+                          {restaurant.address.city},{" "}
+                          {restaurant.address.country}
                         </span>
                       </div>
                     </div>
                   ))}
                 </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
           {activeTab === "menu" && selectedRestaurant && (
             <div>
@@ -253,21 +252,15 @@ export default function UserPage() {
                   <h2>Menu Management</h2>
                   <p>Managing menu for {selectedRestaurant.name}</p>
                 </div>
-                <button className="add-btn">
-                  Add Category
-                </button>
+                <button className="add-btn">Add Category</button>
               </div>
 
               {menuCategories.length === 0 ? (
                 <div className="user-dashboard__empty">
-                  <div className="user-dashboard__empty-icon">
-                    M
-                  </div>
+                  <div className="user-dashboard__empty-icon">M</div>
                   <h3>No menu categories yet</h3>
                   <p>Start building your menu by adding categories</p>
-                  <button className="add-btn">
-                    Add First Category
-                  </button>
+                  <button className="add-btn">Add First Category</button>
                 </div>
               ) : (
                 <div className="user-dashboard__menu-grid">
@@ -287,9 +280,9 @@ export default function UserPage() {
                     </div>
                   ))}
                 </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
           {activeTab === "settings" && (
             <div className="user-dashboard__settings">
@@ -300,27 +293,15 @@ export default function UserPage() {
               <div className="user-dashboard__settings-content">
                 <div className="form-group">
                   <label>Name</label>
-                  <input
-                    type="text"
-                    value={user?.name || ""}
-                    disabled
-                  />
+                  <input type="text" value={user?.name || ""} disabled />
                 </div>
                 <div className="form-group">
                   <label>Email</label>
-                  <input
-                    type="email"
-                    value={user?.email || ""}
-                    disabled
-                  />
+                  <input type="email" value={user?.email || ""} disabled />
                 </div>
                 <div className="form-group">
                   <label>Role</label>
-                  <input
-                    type="text"
-                    value="Restaurant Owner"
-                    disabled
-                  />
+                  <input type="text" value="Restaurant Owner" disabled />
                 </div>
               </div>
             </div>

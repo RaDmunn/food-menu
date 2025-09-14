@@ -108,7 +108,9 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab("overview")}
               className={`admin-dashboard__nav-tab ${
-                activeTab === "overview" ? "admin-dashboard__nav-tab--active" : ""
+                activeTab === "overview"
+                  ? "admin-dashboard__nav-tab--active"
+                  : ""
               }`}
             >
               Overview
@@ -116,7 +118,9 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab("restaurants")}
               className={`admin-dashboard__nav-tab ${
-                activeTab === "restaurants" ? "admin-dashboard__nav-tab--active" : ""
+                activeTab === "restaurants"
+                  ? "admin-dashboard__nav-tab--active"
+                  : ""
               }`}
             >
               Restaurants
@@ -158,7 +162,9 @@ export default function AdminPage() {
                   </div>
                   <div className="admin-dashboard__stat-card-content">
                     <dt>Active Restaurants</dt>
-                    <dd>{restaurants.filter((r) => r.status === "ACTIVE").length}</dd>
+                    <dd>
+                      {restaurants.filter((r) => r.status === "ACTIVE").length}
+                    </dd>
                   </div>
                 </div>
               </div>
@@ -170,7 +176,9 @@ export default function AdminPage() {
                   </div>
                   <div className="admin-dashboard__stat-card-content">
                     <dt>Pending Approval</dt>
-                    <dd>{restaurants.filter((r) => r.status === "PENDING").length}</dd>
+                    <dd>
+                      {restaurants.filter((r) => r.status === "PENDING").length}
+                    </dd>
                   </div>
                 </div>
               </div>

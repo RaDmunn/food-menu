@@ -35,7 +35,10 @@ export async function GET(request: NextRequest) {
         itemCount: cat.items.length,
         sortOrder: cat.sortOrder,
       }))
-      .sort((a: { sortOrder?: number }, b: { sortOrder?: number }) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      .sort(
+        (a: { sortOrder?: number }, b: { sortOrder?: number }) =>
+          (a.sortOrder || 0) - (b.sortOrder || 0)
+      );
 
     return NextResponse.json({
       categories,
@@ -43,11 +46,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Get categories error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -128,10 +129,8 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: unknown) {
     console.error("Create category error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

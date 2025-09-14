@@ -136,11 +136,9 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: unknown) {
     console.error("Add menu item error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -212,11 +210,9 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Update menu item error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -284,10 +280,8 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Delete menu item error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
