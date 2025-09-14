@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import RestaurantForm, {
+  RestaurantFormData,
+} from "@/components/RestaurantForm";
 
 interface User {
   id: string;
@@ -40,6 +43,8 @@ export default function UserPage() {
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("restaurants");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -83,6 +88,36 @@ export default function UserPage() {
       console.error("Error loading restaurants:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateRestaurant = async (restaurantData: RestaurantFormData) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/restaurants", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(restaurantData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setRestaurants((prev) => [...prev, data.restaurant]);
+        setShowCreateForm(false);
+
+        // Show success message or redirect
+        console.log("Restaurant created successfully:", data.restaurant);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create restaurant");
+      }
+    } catch (error) {
+      console.error("Error creating restaurant:", error);
+      // You might want to show an error toast here
+      alert("Failed to create restaurant. Please try again.");
     }
   };
 
@@ -193,15 +228,21 @@ export default function UserPage() {
                   <h2>Your Restaurants</h2>
                   <p>Manage your restaurant locations and details</p>
                 </div>
-                <button className="add-btn">Add New Restaurant</button>
+                {!showCreateForm && restaurants.length > 0 && (
+                  <button
+                    className="add-btn"
+                    onClick={() => setShowCreateForm(true)}
+                  >
+                    Add New Restaurant
+                  </button>
+                )}
               </div>
 
               {restaurants.length === 0 ? (
                 <div className="user-dashboard__empty">
-                  <div className="user-dashboard__empty-icon">R</div>
+                  <div className="user-dashboard__empty-icon">X</div>
                   <h3>No restaurants yet</h3>
                   <p>Get started by adding your first restaurant</p>
-                  <button className="add-btn">Add Restaurant</button>
                 </div>
               ) : (
                 <div className="user-dashboard__restaurant-grid">
@@ -228,18 +269,99 @@ export default function UserPage() {
                         <p>{restaurant.description}</p>
                       </div>
                       <div className="user-dashboard__restaurant-card-footer">
-                        <span
-                          className={`user-dashboard__restaurant-card-status user-dashboard__restaurant-card-status--${restaurant.status.toLowerCase()}`}
+                        <div className="user-dashboard__restaurant-card-info-footer">
+                          <span
+                            className={`user-dashboard__restaurant-card-status user-dashboard__restaurant-card-status--${restaurant.status.toLowerCase()}`}
+                          >
+                            {restaurant.status}
+                          </span>
+                          <span className="user-dashboard__restaurant-card-location">
+                            {restaurant.address.city},{" "}
+                            {restaurant.address.country}
+                          </span>
+                        </div>
+                        <button
+                          className="user-dashboard__restaurant-card-edit-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingRestaurant(restaurant);
+                            setShowCreateForm(true);
+                          }}
                         >
-                          {restaurant.status}
-                        </span>
-                        <span className="user-dashboard__restaurant-card-location">
-                          {restaurant.address.city},{" "}
-                          {restaurant.address.country}
-                        </span>
+                          Edit
+                        </button>
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Restaurant Creation Form */}
+              {(restaurants.length === 0 || showCreateForm) && (
+                <div className="user-dashboard__create-form">
+                  <div className="user-dashboard__section-header">
+                    <div>
+                      <h2>
+                        {editingRestaurant
+                          ? `Edit ${editingRestaurant.name}`
+                          : restaurants.length === 0
+                            ? "Create Your First Restaurant"
+                            : "Add New Restaurant"
+                        }
+                      </h2>
+                      <p>
+                        {editingRestaurant
+                          ? "Update your restaurant details below"
+                          : `Fill in the details below to ${restaurants.length === 0 ? "get started" : "add another restaurant"}`
+                        }
+                      </p>
+                    </div>
+                    {showCreateForm && restaurants.length > 0 && (
+                      <button
+                        className="btn-secondary"
+                        onClick={() => {
+                          setShowCreateForm(false);
+                          setEditingRestaurant(null);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+
+                  <RestaurantForm
+                    onSubmit={handleCreateRestaurant}
+                    loading={loading}
+                    initialData={editingRestaurant ? {
+                      name: editingRestaurant.name,
+                      description: editingRestaurant.description,
+                      cuisineType: editingRestaurant.cuisineType as any[],
+                      address: {
+                        street: editingRestaurant.address.street,
+                        city: editingRestaurant.address.city,
+                        state: (editingRestaurant.address as any).state || '',
+                        zipCode: (editingRestaurant.address as any).zipCode || '',
+                        country: editingRestaurant.address.country
+                      },
+                      contact: {
+                        phone: '',
+                        email: '',
+                        website: '',
+                        socialMedia: {
+                          instagram: '',
+                          facebook: '',
+                          twitter: ''
+                        }
+                      },
+                      workingHours: [],
+                      features: [],
+                      priceRange: {
+                        min: 10,
+                        max: 50,
+                        currency: 'EUR'
+                      }
+                    } : undefined}
+                  />
                 </div>
               )}
             </div>

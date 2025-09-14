@@ -6,6 +6,8 @@
 @use "./users/auth";
 @use "./users/admin.scss";
 @use "./users/user.scss";
+@use "./components/create-restaurant-modal.scss";
+@use "./components/restaurant-form.scss";
 
 * {
   box-sizing: border-box;

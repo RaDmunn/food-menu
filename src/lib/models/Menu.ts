@@ -362,6 +362,15 @@ MenuSchema.pre("save", function (this: IMenu, next) {
   next();
 });
 
+// Interface for static methods
+export interface IMenuModel extends mongoose.Model<IMenu> {
+  findByRestaurant(restaurantId: mongoose.Types.ObjectId): mongoose.Query<IMenu | null, IMenu>;
+  findActiveMenus(): mongoose.Query<IMenu[], IMenu>;
+  findByCategory(restaurantId: mongoose.Types.ObjectId, categoryName: string): mongoose.Query<IMenu | null, IMenu>;
+  getCategoriesForRestaurant(restaurantId: mongoose.Types.ObjectId): mongoose.Query<IMenu | null, IMenu>;
+  searchMenuItems(restaurantId: mongoose.Types.ObjectId, searchTerm: string): mongoose.Query<IMenu | null, IMenu>;
+}
+
 // Export model
-export default mongoose.models.Menu ||
-  mongoose.model<IMenu>("Menu", MenuSchema);
+export default (mongoose.models.Menu as IMenuModel) ||
+  (mongoose.model<IMenu, IMenuModel>("Menu", MenuSchema) as IMenuModel);

@@ -1,0 +1,424 @@
+@import '../variables';
+
+.restaurant-form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+
+  &__section {
+    background: $neutral-white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid $border-light;
+  }
+
+  &__section-title {
+    font-family: $Main-font;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid $border-light;
+  }
+
+  &__subsection {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid $border-light;
+  }
+
+  &__subsection-title {
+    font-family: $Main-font;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: $text-primary;
+    margin: 0 0 16px 0;
+  }
+
+  &__field {
+    margin-bottom: 20px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    display: block;
+    font-family: $Main-font;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: $text-primary;
+    margin-bottom: 8px;
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid $border-light;
+    border-radius: 8px;
+    font-family: $Main-font;
+    font-size: 1rem;
+    color: $text-primary;
+    background: $neutral-white;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-orange;
+      box-shadow: 0 0 0 3px rgba($primary-orange, 0.1);
+    }
+
+    &:disabled {
+      background: $neutral-light-gray;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+
+  &__textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: $Main-font;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: $tablet) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+
+    @media (max-width: $tablet) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__checkbox-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    position: relative;
+
+    &:hover {
+      background: rgba($primary-orange, 0.05);
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      border: 2px solid $border-light;
+      border-radius: 3px;
+      background: $neutral-white;
+      position: relative;
+      transition: all 0.2s ease;
+
+      &:checked {
+        background: $primary-orange;
+        border-color: $primary-orange;
+
+        &::after {
+          content: '✓';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: $neutral-white;
+          font-size: 12px;
+          font-weight: bold;
+        }
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba($primary-orange, 0.2);
+      }
+    }
+  }
+
+  &__checkbox-label {
+    font-family: $Main-font;
+    font-size: 0.9rem;
+    color: $text-primary;
+    user-select: none;
+  }
+
+  // Working Hours Styles
+  &__working-hours {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__working-day {
+    padding: 16px;
+    border: 1px solid $border-light;
+    border-radius: 8px;
+    background: rgba($neutral-white, 0.5);
+  }
+
+  &__day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  &__day-label {
+    font-family: $Main-font;
+    font-size: 1rem;
+    font-weight: 500;
+    color: $text-primary;
+    min-width: 100px;
+  }
+
+  &__time-inputs {
+    display: flex;
+    gap: 16px;
+    align-items: end;
+
+    @media (max-width: $tablet) {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+
+  &__time-field {
+    flex: 1;
+  }
+
+  &__time-label {
+    display: block;
+    font-family: $Main-font;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-primary;
+    margin-bottom: 4px;
+  }
+
+  &__time-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid $border-light;
+    border-radius: 6px;
+    font-family: $Main-font;
+    font-size: 0.95rem;
+    color: $text-primary;
+    background: $neutral-white;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-orange;
+      box-shadow: 0 0 0 2px rgba($primary-orange, 0.1);
+    }
+  }
+
+  // Custom Select Styles
+  &__custom-select {
+    position: relative;
+    width: 100%;
+
+    &-trigger {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid $border-light;
+      border-radius: 8px;
+      font-family: $Main-font;
+      font-size: 1rem;
+      color: $text-primary;
+      background: $neutral-white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+
+      &:hover {
+        border-color: rgba($primary-orange, 0.5);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-orange;
+        box-shadow: 0 0 0 3px rgba($primary-orange, 0.1);
+      }
+    }
+
+    &-arrow {
+      transition: transform 0.2s ease;
+      color: $text-muted;
+      flex-shrink: 0;
+
+      &--open {
+        transform: rotate(180deg);
+        color: $primary-orange;
+      }
+    }
+
+    &-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: $neutral-white;
+      border: 2px solid $border-light;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 8px 24px rgba($text-primary, 0.1);
+      z-index: 10;
+      overflow: hidden;
+      animation: slideDown 0.2s ease-out;
+      max-height: 300px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-search {
+      padding: 8px;
+      border-bottom: 1px solid $border-light;
+      background: rgba($neutral-light-gray, 0.3);
+    }
+
+    &-search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid $border-light;
+      border-radius: 4px;
+      font-family: $Main-font;
+      font-size: 0.9rem;
+      color: $text-primary;
+      background: $neutral-white;
+      transition: all 0.2s ease;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-orange;
+        box-shadow: 0 0 0 2px rgba($primary-orange, 0.1);
+      }
+
+      &::placeholder {
+        color: $text-muted;
+      }
+    }
+
+    &-options {
+      overflow-y: auto;
+      max-height: 250px;
+      flex: 1;
+    }
+
+    &-no-results {
+      padding: 16px;
+      text-align: center;
+      color: $text-muted;
+      font-family: $Main-font;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    &-option {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      background: $neutral-white;
+      font-family: $Main-font;
+      font-size: 1rem;
+      color: $text-primary;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      border-bottom: 1px solid rgba($border-light, 0.5);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: rgba($primary-orange, 0.05);
+        color: $primary-orange;
+      }
+
+      &--selected {
+        background: rgba($primary-orange, 0.1);
+        color: $primary-orange;
+        font-weight: 500;
+
+        &:hover {
+          background: rgba($primary-orange, 0.15);
+        }
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  &__submit-btn {
+    background: $primary-orange;
+    color: $neutral-white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-family: $Main-font;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+
+    &:hover:not(:disabled) {
+      background: darken($primary-orange, 5%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($primary-orange, 0.3);
+    }
+
+    &:disabled {
+      background: $text-muted;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

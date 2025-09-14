@@ -1,66 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
+import {
+  CuisineType,
+  RestaurantStatus,
+  IWorkingHours,
+  IAddress,
+  IContact
+} from "@/lib/types";
 
-// Enum для статуса ресторана
-export enum RestaurantStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  PENDING = "pending",
-  SUSPENDED = "suspended",
-}
-
-// Enum для типа кухни
-export enum CuisineType {
-  ITALIAN = "Italian",
-  CHINESE = "Chinese",
-  JAPANESE = "Japanese",
-  MEXICAN = "Mexican",
-  INDIAN = "Indian",
-  FRENCH = "French",
-  AMERICAN = "American",
-  MEDITERRANEAN = "Mediterranean",
-  THAI = "Thai",
-  KOREAN = "Korean",
-  RUSSIAN = "Russian",
-  EUROPEAN = "European",
-  ASIAN = "Asian",
-  FAST_FOOD = "Fast Food",
-  CAFE = "Cafe",
-  BAR = "Bar",
-  OTHER = "Other",
-}
-
-// Интерфейс для часов работы
-export interface IWorkingHours {
-  day: string; // 'monday', 'tuesday', etc.
-  open: string; // '09:00'
-  close: string; // '22:00'
-  isClosed: boolean;
-}
-
-// Интерфейс для адреса
-export interface IAddress {
-  street: string;
-  city: string;
-  state?: string;
-  zipCode?: string;
-  country: string;
-  coordinates?: {
-    latitude: number;
-    longitude: number;
-  };
-}
-
-// Интерфейс для контактной информации
-export interface IContact {
-  phone?: string;
-  email?: string;
-  website?: string;
-  socialMedia?: {
-    instagram?: string;
-    facebook?: string;
-    twitter?: string;
-  };
-}
+// Экспортируем типы для обратной совместимости
+export type { CuisineType, RestaurantStatus, IWorkingHours, IAddress, IContact };
 
 // Интерфейс для ресторана
 export interface IRestaurant extends Document {
@@ -334,5 +282,4 @@ RestaurantSchema.pre("save", function (next) {
 });
 
 // Экспорт модели
-export default mongoose.models.Restaurant ||
-  mongoose.model<IRestaurant>("Restaurant", RestaurantSchema);
+export default mongoose.models.Restaurant || mongoose.model<IRestaurant>("Restaurant", RestaurantSchema);

@@ -5,8 +5,10 @@ import {
   canAccessRestaurant,
 } from "@/lib/auth";
 import dbConnect from "@/lib/dbConnect";
-import Restaurant, { RestaurantStatus } from "@/lib/models/Restaurant";
+import Restaurant from "@/lib/models/Restaurant";
+import { RestaurantStatus } from "@/lib/types";
 import User, { UserRole } from "@/lib/models/User";
+import Menu from "@/lib/models/Menu";
 
 // GET /api/restaurants - Получить список ресторанов
 export async function GET(request: NextRequest) {
@@ -105,6 +107,15 @@ export async function POST(request: NextRequest) {
     });
 
     const savedRestaurant = await restaurant.save();
+
+    // Создаем пустое меню для ресторана
+    const menu = new Menu({
+      restaurant: savedRestaurant._id,
+      currency: body.priceRange?.currency || "EUR",
+      categories: [],
+      isActive: true,
+    });
+    await menu.save();
 
     // Добавляем ресторан к списку ресторанов владельца
     if (user.role === UserRole.RESTAURANT_OWNER) {
