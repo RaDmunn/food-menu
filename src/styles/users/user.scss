@@ -187,7 +187,11 @@
 
     .add-btn {
       padding: 12px 24px;
-      background: linear-gradient(135deg, $secondary-green 0%, $secondary-green-light 100%);
+      background: linear-gradient(
+        135deg,
+        $secondary-green 0%,
+        $secondary-green-light 100%
+      );
       color: $neutral-white;
       border: none;
       border-radius: 8px;
@@ -250,7 +254,11 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: linear-gradient(135deg, $secondary-green 0%, $secondary-green-light 100%);
+      background: linear-gradient(
+        135deg,
+        $secondary-green 0%,
+        $secondary-green-light 100%
+      );
       display: flex;
       align-items: center;
       justify-content: center;
@@ -291,6 +299,7 @@
         margin: 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
@@ -335,6 +344,7 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      max-width: fit-content;
 
       &--active {
         background: rgba($success, 0.1);
@@ -359,6 +369,25 @@
     }
   }
 
+  // Cancel button styles
+  .cancel-btn {
+    background: $neutral-white;
+    color: $text-primary;
+    border: 2px solid $border-light;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: $Main-font;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $text-muted;
+      background: $neutral-light-gray;
+    }
+  }
+
   // Menu categories grid
   &__menu-grid {
     display: grid;
@@ -374,14 +403,79 @@
   &__menu-card {
     background: $neutral-white;
     border-radius: 12px;
-    padding: 20px;
     box-shadow: 0 4px 16px rgba($neutral-black, 0.08);
     border: 1px solid rgba($border-light, 0.3);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 24px rgba($neutral-black, 0.12);
+      border-color: rgba($primary-orange, 0.3);
+    }
+
+    &-content {
+      padding: 20px;
+      cursor: pointer;
+    }
+
+    &-edit-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: $neutral-white;
+      color: $primary-orange;
+      border: 1px solid $primary-orange;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: $Main-font;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 2;
+
+      &:hover {
+        background: $primary-orange;
+        color: $neutral-white;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba($primary-orange, 0.3);
+      }
+    }
+
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      padding-right: 80px; // Make space for edit button
+
+      h3 {
+        margin: 0;
+        flex: 1;
+      }
+
+      .menu-status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-family: $Main-font;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+
+        &.active {
+          background: rgba($success, 0.1);
+          color: $success;
+        }
+
+        &.inactive {
+          background: rgba($text-muted, 0.1);
+          color: $text-muted;
+        }
+      }
     }
 
     h3 {
@@ -409,6 +503,20 @@
         font-family: $Main-font;
         font-size: 0.85rem;
         color: $text-muted;
+      }
+
+      .currency {
+        font-family: $Main-font;
+        font-size: 0.85rem;
+        color: $primary-orange;
+        font-weight: 500;
+      }
+
+      .restaurant-name {
+        font-family: $Main-font;
+        font-size: 0.85rem;
+        color: $text-secondary;
+        font-weight: 500;
       }
 
       .actions {
@@ -536,7 +644,11 @@
 
     .add-btn {
       padding: 12px 24px;
-      background: linear-gradient(135deg, $secondary-green 0%, $secondary-green-light 100%);
+      background: linear-gradient(
+        135deg,
+        $secondary-green 0%,
+        $secondary-green-light 100%
+      );
       color: $neutral-white;
       border: none;
       border-radius: 8px;
@@ -606,6 +718,10 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

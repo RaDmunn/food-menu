@@ -217,7 +217,6 @@ const MenuSchema = new Schema<IMenu>(
       type: Schema.Types.ObjectId,
       ref: "Restaurant",
       required: [true, "Restaurant is required"],
-      unique: true, // One menu per restaurant
     },
     currency: {
       type: String,
@@ -240,7 +239,9 @@ const MenuSchema = new Schema<IMenu>(
   }
 );
 
-// Indexes for search optimization (restaurant index is already created by unique: true)
+// Indexes for search optimization
+MenuSchema.index({ restaurant: 1 }); // Index for restaurant queries
+MenuSchema.index({ restaurant: 1, name: 1 }, { unique: true }); // Unique menu name per restaurant
 MenuSchema.index({ isActive: 1 });
 MenuSchema.index({ lastUpdated: -1 });
 MenuSchema.index({ "categories.name": 1 });

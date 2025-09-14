@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import RestaurantForm, {
   RestaurantFormData,
 } from "@/components/RestaurantForm";
+import CreateMenuForm, { MenuFormData } from "@/components/CreateMenuForm";
 
 interface User {
   id: string;
@@ -28,6 +29,20 @@ interface Restaurant {
   };
 }
 
+interface Menu {
+  _id: string;
+  name: string;
+  description: string;
+  currency: string;
+  isActive: boolean;
+  restaurant: {
+    _id: string;
+    name: string;
+  };
+  categories: any[];
+  createdAt: string;
+}
+
 interface MenuCategory {
   name: string;
   description: string;
@@ -41,10 +56,15 @@ export default function UserPage() {
   const [selectedRestaurant, setSelectedRestaurant] =
     useState<Restaurant | null>(null);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+  const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("restaurants");
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(null);
+  const [showCreateMenuForm, setShowCreateMenuForm] = useState(false);
+  const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(
+    null
+  );
+  const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -65,12 +85,13 @@ export default function UserPage() {
 
     setUser(parsedUser);
     loadRestaurants();
+    loadMenus();
   }, [router]);
 
   const loadRestaurants = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("/api/restaurants", {
+      const response = await fetch("/api/restaurants?my=true", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,6 +104,8 @@ export default function UserPage() {
           setSelectedRestaurant(data.restaurants[0]);
           loadMenuCategories(data.restaurants[0]._id);
         }
+      } else {
+        console.error("Failed to load restaurants:", response.status);
       }
     } catch (error) {
       console.error("Error loading restaurants:", error);
@@ -94,8 +117,16 @@ export default function UserPage() {
   const handleCreateRestaurant = async (restaurantData: RestaurantFormData) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("/api/restaurants", {
-        method: "POST",
+
+      // Если редактируем ресторан, используем PUT запрос
+      const isEditing = !!editingRestaurant;
+      const url = isEditing
+        ? `/api/restaurants/${editingRestaurant._id}`
+        : "/api/restaurants";
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -105,11 +136,29 @@ export default function UserPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setRestaurants((prev) => [...prev, data.restaurant]);
+
+        if (editingRestaurant) {
+          // Если редактируем, обновляем существующий ресторан в списке
+          setRestaurants((prev) =>
+            prev.map((r) =>
+              r._id === editingRestaurant._id ? data.restaurant : r
+            )
+          );
+        } else {
+          // Если создаем новый, добавляем в список
+          setRestaurants((prev) => [...prev, data.restaurant]);
+        }
+
         setShowCreateForm(false);
+        setEditingRestaurant(null);
 
         // Show success message or redirect
-        console.log("Restaurant created successfully:", data.restaurant);
+        console.log(
+          `Restaurant ${
+            editingRestaurant ? "updated" : "created"
+          } successfully:`,
+          data.restaurant
+        );
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to create restaurant");
@@ -118,6 +167,24 @@ export default function UserPage() {
       console.error("Error creating restaurant:", error);
       // You might want to show an error toast here
       alert("Failed to create restaurant. Please try again.");
+    }
+  };
+
+  const loadMenus = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/menu?my=true", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMenus(data.menus || []);
+      }
+    } catch (error) {
+      console.error("Error loading menus:", error);
     }
   };
 
@@ -139,6 +206,67 @@ export default function UserPage() {
       }
     } catch (error) {
       console.error("Error loading menu categories:", error);
+    }
+  };
+
+  const handleCreateMenu = async (
+    menuData: MenuFormData & { restaurantId: string }
+  ) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      console.log("Menu data being sent:", menuData);
+
+      // Если редактируем меню, используем PUT запрос
+      const isEditing = !!editingMenu;
+      const url = isEditing
+        ? `/api/menu/${editingMenu._id}`
+        : "/api/menu/create";
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(menuData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (isEditing) {
+          // Если редактируем, обновляем существующее меню в списке
+          setMenus((prev) =>
+            prev.map((m) => (m._id === editingMenu._id ? data.menu : m))
+          );
+          console.log("Menu updated successfully:", data.menu);
+        } else {
+          // Если создаем новое, добавляем в список
+          setMenus((prev) => [...prev, data.menu]);
+          console.log("Menu created successfully:", data.menu);
+        }
+
+        setShowCreateMenuForm(false);
+        setEditingMenu(null);
+
+        // Redirect to menu management page
+        router.push(`/menu/${data.menu._id}`);
+      } else {
+        const errorData = await response.json();
+        alert(
+          errorData.error || `Failed to ${isEditing ? "update" : "create"} menu`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Error ${editingMenu ? "updating" : "creating"} menu:`,
+        error
+      );
+      alert(
+        `Failed to ${editingMenu ? "update" : "create"} menu. Please try again.`
+      );
     }
   };
 
@@ -240,7 +368,7 @@ export default function UserPage() {
 
               {restaurants.length === 0 ? (
                 <div className="user-dashboard__empty">
-                  <div className="user-dashboard__empty-icon">X</div>
+                  <div className="user-dashboard__empty-icon">R</div>
                   <h3>No restaurants yet</h3>
                   <p>Get started by adding your first restaurant</p>
                 </div>
@@ -305,15 +433,17 @@ export default function UserPage() {
                         {editingRestaurant
                           ? `Edit ${editingRestaurant.name}`
                           : restaurants.length === 0
-                            ? "Create Your First Restaurant"
-                            : "Add New Restaurant"
-                        }
+                          ? "Create Your First Restaurant"
+                          : "Add New Restaurant"}
                       </h2>
                       <p>
                         {editingRestaurant
                           ? "Update your restaurant details below"
-                          : `Fill in the details below to ${restaurants.length === 0 ? "get started" : "add another restaurant"}`
-                        }
+                          : `Fill in the details below to ${
+                              restaurants.length === 0
+                                ? "get started"
+                                : "add another restaurant"
+                            }`}
                       </p>
                     </div>
                     {showCreateForm && restaurants.length > 0 && (
@@ -332,75 +462,225 @@ export default function UserPage() {
                   <RestaurantForm
                     onSubmit={handleCreateRestaurant}
                     loading={loading}
-                    initialData={editingRestaurant ? {
-                      name: editingRestaurant.name,
-                      description: editingRestaurant.description,
-                      cuisineType: editingRestaurant.cuisineType as any[],
-                      address: {
-                        street: editingRestaurant.address.street,
-                        city: editingRestaurant.address.city,
-                        state: (editingRestaurant.address as any).state || '',
-                        zipCode: (editingRestaurant.address as any).zipCode || '',
-                        country: editingRestaurant.address.country
-                      },
-                      contact: {
-                        phone: '',
-                        email: '',
-                        website: '',
-                        socialMedia: {
-                          instagram: '',
-                          facebook: '',
-                          twitter: ''
-                        }
-                      },
-                      workingHours: [],
-                      features: [],
-                      priceRange: {
-                        min: 10,
-                        max: 50,
-                        currency: 'EUR'
-                      }
-                    } : undefined}
+                    isEditing={!!editingRestaurant}
+                    initialData={
+                      editingRestaurant
+                        ? {
+                            name: editingRestaurant.name,
+                            description: editingRestaurant.description || "",
+                            cuisineType: editingRestaurant.cuisineType as any[],
+                            address: {
+                              street: editingRestaurant.address.street,
+                              city: editingRestaurant.address.city,
+                              state:
+                                (editingRestaurant.address as any).state || "",
+                              zipCode:
+                                (editingRestaurant.address as any).zipCode ||
+                                "",
+                              country: editingRestaurant.address.country,
+                            },
+                            contact: {
+                              phone:
+                                (editingRestaurant as any).contact?.phone || "",
+                              email:
+                                (editingRestaurant as any).contact?.email || "",
+                              website:
+                                (editingRestaurant as any).contact?.website ||
+                                "",
+                              socialMedia: {
+                                instagram:
+                                  (editingRestaurant as any).contact
+                                    ?.socialMedia?.instagram || "",
+                                facebook:
+                                  (editingRestaurant as any).contact
+                                    ?.socialMedia?.facebook || "",
+                                twitter:
+                                  (editingRestaurant as any).contact
+                                    ?.socialMedia?.twitter || "",
+                              },
+                            },
+                            workingHours: (editingRestaurant as any)
+                              .workingHours || [
+                              {
+                                day: "monday",
+                                open: "09:00",
+                                close: "22:00",
+                                isClosed: false,
+                              },
+                              {
+                                day: "tuesday",
+                                open: "09:00",
+                                close: "22:00",
+                                isClosed: false,
+                              },
+                              {
+                                day: "wednesday",
+                                open: "09:00",
+                                close: "22:00",
+                                isClosed: false,
+                              },
+                              {
+                                day: "thursday",
+                                open: "09:00",
+                                close: "22:00",
+                                isClosed: false,
+                              },
+                              {
+                                day: "friday",
+                                open: "09:00",
+                                close: "22:00",
+                                isClosed: false,
+                              },
+                              {
+                                day: "saturday",
+                                open: "09:00",
+                                close: "22:00",
+                                isClosed: false,
+                              },
+                              {
+                                day: "sunday",
+                                open: "09:00",
+                                close: "22:00",
+                                isClosed: true,
+                              },
+                            ],
+                            features: (editingRestaurant as any).features || [],
+                            priceRange: {
+                              min:
+                                (editingRestaurant as any).priceRange?.min ||
+                                10,
+                              max:
+                                (editingRestaurant as any).priceRange?.max ||
+                                50,
+                              currency:
+                                (editingRestaurant as any).priceRange
+                                  ?.currency || "EUR",
+                            },
+                          }
+                        : undefined
+                    }
                   />
                 </div>
               )}
             </div>
           )}
 
-          {activeTab === "menu" && selectedRestaurant && (
+          {activeTab === "menu" && (
             <div>
               <div className="user-dashboard__section-header">
                 <div>
                   <h2>Menu Management</h2>
-                  <p>Managing menu for {selectedRestaurant.name}</p>
+                  <p>Manage all your restaurant menus</p>
                 </div>
-                <button className="add-btn">Add Category</button>
+                {!showCreateMenuForm && (
+                  <button
+                    className="add-btn"
+                    onClick={() => {
+                      setEditingMenu(null);
+                      setShowCreateMenuForm(true);
+                    }}
+                  >
+                    Create New Menu
+                  </button>
+                )}
               </div>
 
-              {menuCategories.length === 0 ? (
+              {/* Menus List */}
+              {menus.length === 0 ? (
                 <div className="user-dashboard__empty">
-                  <div className="user-dashboard__empty-icon">M</div>
-                  <h3>No menu categories yet</h3>
-                  <p>Start building your menu by adding categories</p>
-                  <button className="add-btn">Add First Category</button>
+                  <div className="user-dashboard__empty-icon">📋</div>
+                  <h3>No menus yet</h3>
+                  <p>
+                    Create your first menu to start adding categories and items
+                  </p>
+                  <button
+                    className="add-btn"
+                    onClick={() => setShowCreateMenuForm(true)}
+                  >
+                    Create First Menu
+                  </button>
                 </div>
               ) : (
                 <div className="user-dashboard__menu-grid">
-                  {menuCategories.map((category, index) => (
-                    <div key={index} className="user-dashboard__menu-card">
-                      <h3>{category.name}</h3>
-                      <p>{category.description || "No description"}</p>
-                      <div className="user-dashboard__menu-card-footer">
-                        <span className="item-count">
-                          {category.itemCount} items
-                        </span>
-                        <div className="actions">
-                          <button>Edit</button>
-                          <button>Add Items</button>
+                  {menus.map((menu) => (
+                    <div key={menu._id} className="user-dashboard__menu-card">
+                      <div
+                        className="user-dashboard__menu-card-content"
+                        onClick={() => router.push(`/menu/${menu._id}`)}
+                      >
+                        <div className="user-dashboard__menu-card-header">
+                          <h3>{menu.name}</h3>
+                          <span
+                            className={`menu-status ${
+                              menu.isActive ? "active" : "inactive"
+                            }`}
+                          >
+                            {menu.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </div>
+                        <p>{menu.description || "No description"}</p>
+                        <div className="user-dashboard__menu-card-footer">
+                          <span className="item-count">
+                            {menu.categories?.length || 0} categories
+                          </span>
+                          <span className="currency">{menu.currency}</span>
+                          <span className="restaurant-name">
+                            {menu.restaurant.name}
+                          </span>
                         </div>
                       </div>
+                      <button
+                        className="user-dashboard__menu-card-edit-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingMenu(menu);
+                          setShowCreateMenuForm(true);
+                        }}
+                      >
+                        Edit
+                      </button>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Menu Creation Form */}
+              {showCreateMenuForm && (
+                <div className="user-dashboard__create-form">
+                  <div className="user-dashboard__section-header">
+                    <div>
+                      <h2>
+                        {editingMenu
+                          ? `Edit ${editingMenu.name || "Menu"}`
+                          : "Create New Menu"}
+                      </h2>
+                      <p>
+                        {editingMenu
+                          ? "Update your menu details below"
+                          : "Fill in the details below to create a new menu"}
+                      </p>
+                    </div>
+                    <button
+                      className="cancel-btn"
+                      onClick={() => {
+                        setShowCreateMenuForm(false);
+                        setEditingMenu(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <CreateMenuForm
+                    restaurants={restaurants}
+                    selectedRestaurantId={selectedRestaurant?._id}
+                    editingMenu={editingMenu}
+                    onSubmit={handleCreateMenu}
+                    onCancel={() => {
+                      setShowCreateMenuForm(false);
+                      setEditingMenu(null);
+                    }}
+                    loading={loading}
+                  />
                 </div>
               )}
             </div>

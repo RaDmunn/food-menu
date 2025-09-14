@@ -4,7 +4,7 @@ import dbConnect from "@/lib/dbConnect";
 import Menu, { MenuItemStatus } from "@/lib/models/Menu";
 import Restaurant from "@/lib/models/Restaurant";
 
-// GET /api/menu - Get complete menu for restaurant
+// GET /api/menu - Get complete menu for restaurant or all menus for user
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
@@ -13,6 +13,33 @@ export async function GET(request: NextRequest) {
     const restaurantId = searchParams.get("restaurant");
     const category = searchParams.get("category");
     const search = searchParams.get("search");
+    const myMenus = searchParams.get("my"); // New parameter to get all user's menus
+
+    // If requesting user's menus, require authentication
+    if (myMenus === "true") {
+      const user = await requireAuth(request);
+      if (!user) {
+        return NextResponse.json(
+          { error: "Authentication required" },
+          { status: 401 }
+        );
+      }
+
+      // Get all restaurants owned by the user
+      const restaurants = await Restaurant.find({ owner: user._id }).select(
+        "_id"
+      );
+      const restaurantIds = restaurants.map((r) => r._id);
+
+      // Get all menus for user's restaurants
+      const menus = await Menu.find({
+        restaurant: { $in: restaurantIds },
+      })
+        .populate("restaurant", "name")
+        .sort({ createdAt: -1 });
+
+      return NextResponse.json({ menus });
+    }
 
     if (!restaurantId) {
       return NextResponse.json(

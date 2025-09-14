@@ -20,24 +20,41 @@ export async function GET(request: NextRequest) {
     const cuisine = searchParams.get("cuisine");
     const status = searchParams.get("status");
     const ownerId = searchParams.get("owner");
+    const myRestaurants = searchParams.get("my"); // Новый параметр для получения ресторанов пользователя
 
     const query: Record<string, unknown> = {};
 
-    // Фильтры
-    if (city) {
-      query["address.city"] = new RegExp(city, "i");
-    }
-    if (cuisine) {
-      query.cuisineType = cuisine;
-    }
-    if (status) {
-      query.status = status;
+    // Если запрашиваются рестораны пользователя, требуем аутентификацию
+    if (myRestaurants === "true") {
+      const user = await requireAuth(request);
+      if (!user) {
+        return NextResponse.json(
+          { error: "Authentication required" },
+          { status: 401 }
+        );
+      }
+
+      // Получаем рестораны текущего пользователя
+      query.owner = user._id;
+      // Для владельца показываем все статусы его ресторанов
     } else {
-      // По умолчанию показываем только активные рестораны
-      query.status = RestaurantStatus.ACTIVE;
-    }
-    if (ownerId) {
-      query.owner = ownerId;
+      // Публичный поиск ресторанов
+      // Фильтры
+      if (city) {
+        query["address.city"] = new RegExp(city, "i");
+      }
+      if (cuisine) {
+        query.cuisineType = cuisine;
+      }
+      if (status) {
+        query.status = status;
+      } else {
+        // По умолчанию показываем только активные рестораны
+        query.status = RestaurantStatus.ACTIVE;
+      }
+      if (ownerId) {
+        query.owner = ownerId;
+      }
     }
 
     const restaurants = await Restaurant.find(query)

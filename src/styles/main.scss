@@ -8,6 +8,8 @@
 @use "./users/user.scss";
 @use "./components/create-restaurant-modal.scss";
 @use "./components/restaurant-form.scss";
+@use "./components/create-menu-form.scss";
+@use "./menu/menu-management.scss";
 
 * {
   box-sizing: border-box;

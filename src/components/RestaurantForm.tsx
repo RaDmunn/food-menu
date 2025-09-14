@@ -155,6 +155,7 @@ interface RestaurantFormProps {
   onSubmit: (data: RestaurantFormData) => Promise<void>;
   loading?: boolean;
   initialData?: Partial<RestaurantFormData>;
+  isEditing?: boolean;
 }
 
 const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -232,7 +233,7 @@ const CURRENCY_OPTIONS = [
   { value: 'SGD', label: 'SGD - Singapore Dollar' },
 ];
 
-export default function RestaurantForm({ onSubmit, loading = false, initialData }: RestaurantFormProps) {
+export default function RestaurantForm({ onSubmit, loading = false, initialData, isEditing = false }: RestaurantFormProps) {
   const [formData, setFormData] = useState<RestaurantFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -268,8 +269,47 @@ export default function RestaurantForm({ onSubmit, loading = false, initialData 
     }
   });
 
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: {[key: string]: string} = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Restaurant name is required';
+    }
+
+    if (formData.cuisineType.length === 0) {
+      newErrors.cuisineType = 'At least one cuisine type is required';
+    }
+
+    if (!formData.address.street.trim()) {
+      newErrors.street = 'Street address is required';
+    }
+
+    if (!formData.address.city.trim()) {
+      newErrors.city = 'City is required';
+    }
+
+    if (!formData.address.country.trim()) {
+      newErrors.country = 'Country is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector('.restaurant-form__input--error, .restaurant-form__checkbox-grid--error');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     try {
       await onSubmit(formData);
     } catch (error) {
@@ -314,12 +354,18 @@ export default function RestaurantForm({ onSubmit, loading = false, initialData 
           <label className="restaurant-form__label">Restaurant Name *</label>
           <input
             type="text"
-            className="restaurant-form__input"
+            className={`restaurant-form__input ${errors.name ? 'restaurant-form__input--error' : ''}`}
             value={formData.name}
-            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            onChange={(e) => {
+              setFormData(prev => ({ ...prev, name: e.target.value }));
+              if (errors.name) {
+                setErrors(prev => ({ ...prev, name: '' }));
+              }
+            }}
             required
             placeholder="Enter restaurant name"
           />
+          {errors.name && <span className="restaurant-form__error">{errors.name}</span>}
         </div>
 
         <div className="restaurant-form__field">
@@ -335,18 +381,24 @@ export default function RestaurantForm({ onSubmit, loading = false, initialData 
 
         <div className="restaurant-form__field">
           <label className="restaurant-form__label">Cuisine Types *</label>
-          <div className="restaurant-form__checkbox-grid">
+          <div className={`restaurant-form__checkbox-grid ${errors.cuisineType ? 'restaurant-form__checkbox-grid--error' : ''}`}>
             {CUISINE_OPTIONS.map(cuisine => (
               <label key={cuisine} className="restaurant-form__checkbox-item">
                 <input
                   type="checkbox"
                   checked={formData.cuisineType.includes(cuisine)}
-                  onChange={() => handleCuisineChange(cuisine)}
+                  onChange={() => {
+                    handleCuisineChange(cuisine);
+                    if (errors.cuisineType) {
+                      setErrors(prev => ({ ...prev, cuisineType: '' }));
+                    }
+                  }}
                 />
                 <span className="restaurant-form__checkbox-label">{cuisine}</span>
               </label>
             ))}
           </div>
+          {errors.cuisineType && <span className="restaurant-form__error">{errors.cuisineType}</span>}
         </div>
       </div>
 
@@ -358,15 +410,21 @@ export default function RestaurantForm({ onSubmit, loading = false, initialData 
           <label className="restaurant-form__label">Street Address *</label>
           <input
             type="text"
-            className="restaurant-form__input"
+            className={`restaurant-form__input ${errors.street ? 'restaurant-form__input--error' : ''}`}
             value={formData.address.street}
-            onChange={(e) => setFormData(prev => ({ 
-              ...prev, 
-              address: { ...prev.address, street: e.target.value }
-            }))}
+            onChange={(e) => {
+              setFormData(prev => ({
+                ...prev,
+                address: { ...prev.address, street: e.target.value }
+              }));
+              if (errors.street) {
+                setErrors(prev => ({ ...prev, street: '' }));
+              }
+            }}
             required
             placeholder="Enter street address"
           />
+          {errors.street && <span className="restaurant-form__error">{errors.street}</span>}
         </div>
 
         <div className="restaurant-form__row">
@@ -374,15 +432,21 @@ export default function RestaurantForm({ onSubmit, loading = false, initialData 
             <label className="restaurant-form__label">City *</label>
             <input
               type="text"
-              className="restaurant-form__input"
+              className={`restaurant-form__input ${errors.city ? 'restaurant-form__input--error' : ''}`}
               value={formData.address.city}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                address: { ...prev.address, city: e.target.value }
-              }))}
+              onChange={(e) => {
+                setFormData(prev => ({
+                  ...prev,
+                  address: { ...prev.address, city: e.target.value }
+                }));
+                if (errors.city) {
+                  setErrors(prev => ({ ...prev, city: '' }));
+                }
+              }}
               required
               placeholder="Enter city"
             />
+            {errors.city && <span className="restaurant-form__error">{errors.city}</span>}
           </div>
           
           <div className="restaurant-form__field">
@@ -664,12 +728,15 @@ export default function RestaurantForm({ onSubmit, loading = false, initialData 
       </div>
 
       <div className="restaurant-form__actions">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="restaurant-form__submit-btn"
           disabled={loading || !formData.name || formData.cuisineType.length === 0}
         >
-          {loading ? 'Creating Restaurant...' : 'Create Restaurant'}
+          {loading
+            ? (isEditing ? 'Updating Restaurant...' : 'Creating Restaurant...')
+            : (isEditing ? 'Update Restaurant' : 'Create Restaurant')
+          }
         </button>
       </div>
     </form>
