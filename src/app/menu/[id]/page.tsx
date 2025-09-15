@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 
 interface Menu {
   _id: string;
@@ -91,9 +91,9 @@ export default function MenuManagementPage() {
           <div className="menu-management__error">
             <h2>Error</h2>
             <p>{error || "Menu not found"}</p>
-            <button 
+            <button
               className="btn-primary"
-              onClick={() => router.push('/user')}
+              onClick={() => router.push("/user")}
             >
               Back to Dashboard
             </button>
@@ -109,29 +109,31 @@ export default function MenuManagementPage() {
         {/* Header */}
         <div className="menu-management__header">
           <div className="menu-management__breadcrumb">
-            <button 
+            <button
               className="menu-management__back-btn"
-              onClick={() => router.push('/user')}
+              onClick={() => router.push("/user")}
             >
               ← Back to Dashboard
             </button>
           </div>
-          
+
           <div className="menu-management__title-section">
             <h1>{menu.name}</h1>
             <p className="menu-management__restaurant-name">
               {menu.restaurant.name}
             </p>
             {menu.description && (
-              <p className="menu-management__description">
-                {menu.description}
-              </p>
+              <p className="menu-management__description">{menu.description}</p>
             )}
           </div>
 
           <div className="menu-management__meta">
-            <span className={`menu-management__status ${menu.isActive ? 'active' : 'inactive'}`}>
-              {menu.isActive ? 'Active' : 'Inactive'}
+            <span
+              className={`menu-management__status ${
+                menu.isActive ? "active" : "inactive"
+              }`}
+            >
+              {menu.isActive ? "Active" : "Inactive"}
             </span>
             <span className="menu-management__currency">
               Currency: {menu.currency}
@@ -144,19 +146,18 @@ export default function MenuManagementPage() {
           <div className="menu-management__section">
             <div className="menu-management__section-header">
               <h2>Menu Categories</h2>
-              <button className="btn-primary">
-                Add Category
-              </button>
+              <button className="btn-primary">Add Category</button>
             </div>
 
             {menu.categories.length === 0 ? (
               <div className="menu-management__empty">
                 <div className="menu-management__empty-icon">📋</div>
                 <h3>No categories yet</h3>
-                <p>Start building your menu by adding categories like "Appetizers", "Main Courses", "Desserts", etc.</p>
-                <button className="btn-primary">
-                  Add First Category
-                </button>
+                <p>
+                  Start building your menu by adding categories like
+                  "Appetizers", "Main Courses", "Desserts", etc.
+                </p>
+                <button className="btn-primary">Add First Category</button>
               </div>
             ) : (
               <div className="menu-management__categories">

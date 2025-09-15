@@ -36,8 +36,7 @@
     backdrop-filter: blur(20px);
     border-radius: 24px;
     padding: 48px 40px;
-    box-shadow: 
-      0 20px 40px rgba($neutral-black, 0.1),
+    box-shadow: 0 20px 40px rgba($neutral-black, 0.1),
       0 8px 16px rgba($primary-orange, 0.05),
       inset 0 1px 0 rgba($neutral-white, 0.8);
     border: 1px solid rgba($border-light, 0.3);
@@ -412,7 +411,8 @@
 }
 
 @keyframes gradientFlow {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {

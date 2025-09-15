@@ -41,7 +41,11 @@
     justify-content: space-between;
     padding: 24px;
     border-bottom: 1px solid $border-light;
-    background: linear-gradient(135deg, rgba($secondary-green, 0.05) 0%, rgba($secondary-green-light, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($secondary-green, 0.05) 0%,
+      rgba($secondary-green-light, 0.05) 100%
+    );
 
     h2 {
       font-family: $Title-font;
@@ -107,7 +111,9 @@
         margin-bottom: 6px;
       }
 
-      input, textarea, select {
+      input,
+      textarea,
+      select {
         width: 100%;
         padding: 12px 16px;
         border: 2px solid $border-light;
@@ -218,7 +224,11 @@
 
     .btn-primary {
       padding: 12px 24px;
-      background: linear-gradient(135deg, $secondary-green 0%, $secondary-green-light 100%);
+      background: linear-gradient(
+        135deg,
+        $secondary-green 0%,
+        $secondary-green-light 100%
+      );
       border: none;
       color: $neutral-white;
       border-radius: 8px;
@@ -242,7 +252,7 @@
 
     @media (max-width: $tablet) {
       flex-direction: column;
-      
+
       .btn-secondary,
       .btn-primary {
         width: 100%;
@@ -286,7 +296,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      
+
       input[type="checkbox"] {
         width: auto;
         margin: 0;
@@ -302,7 +312,7 @@
 
     &.is-closed {
       opacity: 0.6;
-      
+
       input[type="time"] {
         background: $neutral-light-gray;
         cursor: not-allowed;

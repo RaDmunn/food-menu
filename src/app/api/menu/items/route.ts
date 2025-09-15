@@ -43,7 +43,13 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!restaurantId || !menuName || !categoryName || !name || price === undefined) {
+    if (
+      !restaurantId ||
+      !menuName ||
+      !categoryName ||
+      !name ||
+      price === undefined
+    ) {
       return NextResponse.json(
         {
           error:
@@ -63,7 +69,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Find specific menu by restaurant and name
-    const menu = await Menu.findOne({ restaurant: restaurantId, name: menuName });
+    const menu = await Menu.findOne({
+      restaurant: restaurantId,
+      name: menuName,
+    });
     if (!menu) {
       return NextResponse.json(
         { error: "Menu not found. Create the menu first." },

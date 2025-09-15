@@ -193,7 +193,11 @@
       font-weight: bold;
 
       &--restaurants {
-        background: linear-gradient(135deg, $primary-orange 0%, $primary-orange-light 100%);
+        background: linear-gradient(
+          135deg,
+          $primary-orange 0%,
+          $primary-orange-light 100%
+        );
         color: $neutral-white;
       }
 
@@ -297,7 +301,11 @@
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        background: linear-gradient(135deg, $neutral-gray 0%, $neutral-dark-gray 100%);
+        background: linear-gradient(
+          135deg,
+          $neutral-gray 0%,
+          $neutral-dark-gray 100%
+        );
         display: flex;
         align-items: center;
         justify-content: center;
@@ -420,6 +428,10 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

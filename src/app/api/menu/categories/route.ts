@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { restaurantId, menuName, categoryName, description, sortOrder } = body;
+    const { restaurantId, menuName, categoryName, description, sortOrder } =
+      body;
 
     if (!restaurantId || !menuName || !categoryName) {
       return NextResponse.json(

@@ -33,7 +33,9 @@ export async function GET(
     }
 
     // Проверяем, что пользователь является владельцем ресторана
-    if ((menu.restaurant as any).owner.toString() !== (user as any)._id.toString()) {
+    if (
+      (menu.restaurant as any).owner.toString() !== (user as any)._id.toString()
+    ) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
@@ -73,7 +75,9 @@ export async function PUT(
     }
 
     // Проверяем, что пользователь является владельцем ресторана
-    if ((menu.restaurant as any).owner.toString() !== (user as any)._id.toString()) {
+    if (
+      (menu.restaurant as any).owner.toString() !== (user as any)._id.toString()
+    ) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
@@ -122,7 +126,9 @@ export async function DELETE(
     }
 
     // Проверяем, что пользователь является владельцем ресторана
-    if ((menu.restaurant as any).owner.toString() !== (user as any)._id.toString()) {
+    if (
+      (menu.restaurant as any).owner.toString() !== (user as any)._id.toString()
+    ) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 

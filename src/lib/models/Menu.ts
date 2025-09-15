@@ -321,7 +321,11 @@ MenuSchema.statics.findByCategory = function (
   if (menuName) {
     query.name = menuName;
   }
-  return this.find(query, { "categories.$": 1 }, { "categories.name": categoryName });
+  return this.find(
+    query,
+    { "categories.$": 1 },
+    { "categories.name": categoryName }
+  );
 };
 
 MenuSchema.statics.getCategoriesForRestaurant = function (
@@ -396,12 +400,28 @@ MenuSchema.pre("save", function (this: IMenu, next) {
 
 // Interface for static methods
 export interface IMenuModel extends mongoose.Model<IMenu> {
-  findByRestaurant(restaurantId: mongoose.Types.ObjectId): mongoose.Query<IMenu[], IMenu>;
-  findMenuByName(restaurantId: mongoose.Types.ObjectId, menuName: string): mongoose.Query<IMenu | null, IMenu>;
+  findByRestaurant(
+    restaurantId: mongoose.Types.ObjectId
+  ): mongoose.Query<IMenu[], IMenu>;
+  findMenuByName(
+    restaurantId: mongoose.Types.ObjectId,
+    menuName: string
+  ): mongoose.Query<IMenu | null, IMenu>;
   findActiveMenus(): mongoose.Query<IMenu[], IMenu>;
-  findByCategory(restaurantId: mongoose.Types.ObjectId, categoryName: string, menuName?: string): mongoose.Query<IMenu[], IMenu>;
-  getCategoriesForRestaurant(restaurantId: mongoose.Types.ObjectId, menuName?: string): mongoose.Query<IMenu[], IMenu>;
-  searchMenuItems(restaurantId: mongoose.Types.ObjectId, searchTerm: string, menuName?: string): mongoose.Query<IMenu[], IMenu>;
+  findByCategory(
+    restaurantId: mongoose.Types.ObjectId,
+    categoryName: string,
+    menuName?: string
+  ): mongoose.Query<IMenu[], IMenu>;
+  getCategoriesForRestaurant(
+    restaurantId: mongoose.Types.ObjectId,
+    menuName?: string
+  ): mongoose.Query<IMenu[], IMenu>;
+  searchMenuItems(
+    restaurantId: mongoose.Types.ObjectId,
+    searchTerm: string,
+    menuName?: string
+  ): mongoose.Query<IMenu[], IMenu>;
 }
 
 // Export model

@@ -75,7 +75,13 @@ export default function AdminPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner size="large" text="Loading admin dashboard..." fullScreen />;
+    return (
+      <LoadingSpinner
+        size="large"
+        text="Loading admin dashboard..."
+        fullScreen
+      />
+    );
   }
 
   return (

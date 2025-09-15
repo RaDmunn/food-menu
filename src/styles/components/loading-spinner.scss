@@ -1,4 +1,4 @@
-@import '../variables';
+@import "../variables";
 
 .loading-spinner-container {
   display: flex;
@@ -9,7 +9,12 @@
 
   &--fullscreen {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba($neutral-light-gray, 0.3) 0%, white 50%, rgba($neutral-light-gray, 0.2) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($neutral-light-gray, 0.3) 0%,
+      white 50%,
+      rgba($neutral-light-gray, 0.2) 100%
+    );
   }
 }
 

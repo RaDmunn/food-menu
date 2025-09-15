@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         currency: 1,
         restaurant: 1,
         name: 1,
-        description: 1
+        description: 1,
       }).populate("restaurant", "name");
     } else if (search) {
       // Search in menu items
@@ -121,13 +121,16 @@ export async function GET(request: NextRequest) {
       menus: filteredMenus,
       totalMenus: filteredMenus.length,
       totalCategories: filteredMenus.reduce(
-        (sum: number, menu: { categories: unknown[] }) => sum + menu.categories.length,
+        (sum: number, menu: { categories: unknown[] }) =>
+          sum + menu.categories.length,
         0
       ),
       totalItems: filteredMenus.reduce(
         (sum: number, menu: { categories: { items: unknown[] }[] }) =>
-          sum + menu.categories.reduce(
-            (catSum: number, cat: { items: unknown[] }) => catSum + cat.items.length,
+          sum +
+          menu.categories.reduce(
+            (catSum: number, cat: { items: unknown[] }) =>
+              catSum + cat.items.length,
             0
           ),
         0

@@ -57,28 +57,51 @@ export default function Header() {
   return (
     <div className="header-wrap">
       <header className="header">
-        <a className="header__brand" href="/">DOMAIN</a>
+        <a className="header__brand" href="/">
+          DOMAIN
+        </a>
         <nav className="header__nav">
-          <a href="/" className="header__link">Home</a>
-          <a href="/features" className="header__link">Features</a>
-          <a href="/pricing" className="header__link">Pricing</a>
-          <a href="/contact" className="header__link">Contact</a>
+          <a href="/" className="header__link">
+            Home
+          </a>
+          <a href="/features" className="header__link">
+            Features
+          </a>
+          <a href="/pricing" className="header__link">
+            Pricing
+          </a>
+          <a href="/contact" className="header__link">
+            Contact
+          </a>
         </nav>
         <div className="header__actions">
-          <a href="/docs" className="header__button header__button--ghost">Docs</a>
-          <a href="/faq" className="header__button header__button--ghost">FAQ</a>
-          <a href="/demo" className="header__button header__button--cta">Request demo</a>
+          <a href="/docs" className="header__button header__button--ghost">
+            Docs
+          </a>
+          <a href="/faq" className="header__button header__button--ghost">
+            FAQ
+          </a>
+          <a href="/demo" className="header__button header__button--cta">
+            Request demo
+          </a>
           <div className="lang" ref={ddRef}>
-            <button className="lang__trigger" onClick={() => setLangOpen(v => !v)}>
+            <button
+              className="lang__trigger"
+              onClick={() => setLangOpen((v) => !v)}
+            >
               {current.flag}
               <span className="lang__code">{current.code.toUpperCase()}</span>
-              <span className={`lang__chev ${langOpen ? "is-open" : ""}`}>▾</span>
+              <span className={`lang__chev ${langOpen ? "is-open" : ""}`}>
+                ▾
+              </span>
             </button>
             <div className={`lang__menu ${langOpen ? "is-open" : ""}`}>
-              {languages.map(l => (
+              {languages.map((l) => (
                 <button
                   key={l.code}
-                  className={`lang__item ${l.code === current.code ? "is-active" : ""}`}
+                  className={`lang__item ${
+                    l.code === current.code ? "is-active" : ""
+                  }`}
                   onClick={() => {
                     setCurrent(l);
                     setLangOpen(false);
@@ -95,7 +118,7 @@ export default function Header() {
             className="header__burger"
             aria-label="Menu"
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(v => !v)}
+            onClick={() => setMenuOpen((v) => !v)}
           >
             <span />
             <span />
@@ -107,25 +130,65 @@ export default function Header() {
       <div className={`header-mobile ${menuOpen ? "is-open" : ""}`}>
         <div className="header-mobile__panel">
           <div className="header-mobile__top">
-            <a className="header__brand" href="/" onClick={() => setMenuOpen(false)}>habernier.com</a>
-            <button className="header-mobile__close" aria-label="Close" onClick={() => setMenuOpen(false)}>✕</button>
+            <a
+              className="header__brand"
+              href="/"
+              onClick={() => setMenuOpen(false)}
+            >
+              habernier.com
+            </a>
+            <button
+              className="header-mobile__close"
+              aria-label="Close"
+              onClick={() => setMenuOpen(false)}
+            >
+              ✕
+            </button>
           </div>
           <nav className="header-mobile__nav">
-            <a href="/" onClick={() => setMenuOpen(false)}>Home</a>
-            <a href="/features" onClick={() => setMenuOpen(false)}>Features</a>
-            <a href="/pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
-            <a href="/contact" onClick={() => setMenuOpen(false)}>Contact</a>
+            <a href="/" onClick={() => setMenuOpen(false)}>
+              Home
+            </a>
+            <a href="/features" onClick={() => setMenuOpen(false)}>
+              Features
+            </a>
+            <a href="/pricing" onClick={() => setMenuOpen(false)}>
+              Pricing
+            </a>
+            <a href="/contact" onClick={() => setMenuOpen(false)}>
+              Contact
+            </a>
           </nav>
           <div className="header-mobile__actions">
-            <a href="/docs" className="header__button header__button--ghost" onClick={() => setMenuOpen(false)}>Docs</a>
-            <a href="/faq" className="header__button header__button--ghost" onClick={() => setMenuOpen(false)}>FAQ</a>
-            <a href="/demo" className="header__button header__button--cta" onClick={() => setMenuOpen(false)}>Request demo</a>
+            <a
+              href="/docs"
+              className="header__button header__button--ghost"
+              onClick={() => setMenuOpen(false)}
+            >
+              Docs
+            </a>
+            <a
+              href="/faq"
+              className="header__button header__button--ghost"
+              onClick={() => setMenuOpen(false)}
+            >
+              FAQ
+            </a>
+            <a
+              href="/demo"
+              className="header__button header__button--cta"
+              onClick={() => setMenuOpen(false)}
+            >
+              Request demo
+            </a>
           </div>
           <div className="header-mobile__langs">
-            {languages.map(l => (
+            {languages.map((l) => (
               <button
                 key={l.code}
-                className={`header-mobile__lang ${l.code === current.code ? "is-active" : ""}`}
+                className={`header-mobile__lang ${
+                  l.code === current.code ? "is-active" : ""
+                }`}
                 onClick={() => {
                   setCurrent(l);
                   setMenuOpen(false);
@@ -138,7 +201,11 @@ export default function Header() {
             ))}
           </div>
         </div>
-        <button className="header-mobile__backdrop" aria-hidden="true" onClick={() => setMenuOpen(false)} />
+        <button
+          className="header-mobile__backdrop"
+          aria-hidden="true"
+          onClick={() => setMenuOpen(false)}
+        />
       </div>
     </div>
   );

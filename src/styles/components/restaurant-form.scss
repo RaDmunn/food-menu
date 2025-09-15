@@ -1,4 +1,4 @@
-@import '../variables';
+@import "../variables";
 
 .restaurant-form {
   max-width: 800px;
@@ -164,7 +164,7 @@
         border-color: $primary-orange;
 
         &::after {
-          content: '✓';
+          content: "✓";
           position: absolute;
           top: 50%;
           left: 50%;

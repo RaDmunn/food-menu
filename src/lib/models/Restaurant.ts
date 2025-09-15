@@ -4,11 +4,17 @@ import {
   RestaurantStatus,
   IWorkingHours,
   IAddress,
-  IContact
+  IContact,
 } from "@/lib/types";
 
 // Экспортируем типы для обратной совместимости
-export type { CuisineType, RestaurantStatus, IWorkingHours, IAddress, IContact };
+export type {
+  CuisineType,
+  RestaurantStatus,
+  IWorkingHours,
+  IAddress,
+  IContact,
+};
 
 // Интерфейс для ресторана
 export interface IRestaurant extends Document {
@@ -282,4 +288,5 @@ RestaurantSchema.pre("save", function (next) {
 });
 
 // Экспорт модели
-export default mongoose.models.Restaurant || mongoose.model<IRestaurant>("Restaurant", RestaurantSchema);
+export default mongoose.models.Restaurant ||
+  mongoose.model<IRestaurant>("Restaurant", RestaurantSchema);
