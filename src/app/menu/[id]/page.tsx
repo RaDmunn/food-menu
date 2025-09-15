@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface Menu {
   _id: string;
@@ -72,16 +73,7 @@ export default function MenuManagementPage() {
   };
 
   if (loading) {
-    return (
-      <div className="menu-management">
-        <div className="container">
-          <div className="menu-management__loading">
-            <div className="spinner"></div>
-            <p>Loading menu...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner size="large" text="Loading menu..." fullScreen />;
   }
 
   if (error || !menu) {
