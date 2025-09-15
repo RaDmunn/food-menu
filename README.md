@@ -39,3 +39,7 @@ sass main.scss main.css --watch
 
 export PATH=$PATH:/c/Users/radmunn/AppData/Roaming/npm
 
+
+
+
+mongod --dbpath "C:\data\db"
