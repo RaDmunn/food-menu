@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     const {
       restaurantId,
       menuName,
+      sectionName,
       categoryName,
       name,
       description,
@@ -46,6 +47,7 @@ export async function POST(request: NextRequest) {
     if (
       !restaurantId ||
       !menuName ||
+      !sectionName ||
       !categoryName ||
       !name ||
       price === undefined
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Restaurant ID, menu name, category name, item name, and price are required",
+            "Restaurant ID, menu name, section name, category name, item name, and price are required",
         },
         { status: 400 }
       );
@@ -80,8 +82,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find category
-    const category = menu.categories.find(
+    // Find section
+    const section = menu.sections.find(
+      (sec) => sec.name.toLowerCase() === sectionName.toLowerCase() && sec.isActive
+    );
+
+    if (!section) {
+      return NextResponse.json(
+        { error: "Section not found or inactive" },
+        { status: 404 }
+      );
+    }
+
+    // Find category within section
+    const category = section.categories.find(
       (cat: IMenuCategory) =>
         cat.name.toLowerCase() === categoryName.toLowerCase() && cat.isActive
     );
@@ -166,14 +180,14 @@ export async function PUT(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { restaurantId, categoryName, itemName, updates } = body;
+    const { restaurantId, menuName, sectionName, categoryName, itemName, updates } = body;
 
     // Validate required fields
-    if (!restaurantId || !categoryName || !itemName || !updates) {
+    if (!restaurantId || !menuName || !sectionName || !categoryName || !itemName || !updates) {
       return NextResponse.json(
         {
           error:
-            "Restaurant ID, category name, item name, and updates are required",
+            "Restaurant ID, menu name, section name, category name, item name, and updates are required",
         },
         { status: 400 }
       );
@@ -192,17 +206,23 @@ export async function PUT(request: NextRequest) {
     const menu = await Menu.findOneAndUpdate(
       {
         restaurant: restaurantId,
-        "categories.name": categoryName,
-        "categories.items.name": itemName,
+        name: menuName,
+        "sections.name": sectionName,
+        "sections.categories.name": categoryName,
+        "sections.categories.items.name": itemName,
       },
       {
         $set: {
-          "categories.$[cat].items.$[item]": { ...updates },
+          "sections.$[sec].categories.$[cat].items.$[item]": { ...updates },
           lastUpdated: new Date(),
         },
       },
       {
-        arrayFilters: [{ "cat.name": categoryName }, { "item.name": itemName }],
+        arrayFilters: [
+          { "sec.name": sectionName },
+          { "cat.name": categoryName },
+          { "item.name": itemName }
+        ],
         new: true,
       }
     );
@@ -241,13 +261,15 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const restaurantId = searchParams.get("restaurant");
+    const menuName = searchParams.get("menu");
+    const sectionName = searchParams.get("section");
     const categoryName = searchParams.get("category");
     const itemName = searchParams.get("item");
 
     // Validate required fields
-    if (!restaurantId || !categoryName || !itemName) {
+    if (!restaurantId || !menuName || !sectionName || !categoryName || !itemName) {
       return NextResponse.json(
-        { error: "Restaurant ID, category name, and item name are required" },
+        { error: "Restaurant ID, menu name, section name, category name, and item name are required" },
         { status: 400 }
       );
     }
@@ -265,17 +287,25 @@ export async function DELETE(request: NextRequest) {
     const menu = await Menu.findOneAndUpdate(
       {
         restaurant: restaurantId,
-        "categories.name": categoryName,
+        name: menuName,
+        "sections.name": sectionName,
+        "sections.categories.name": categoryName,
       },
       {
         $pull: {
-          "categories.$.items": { name: itemName },
+          "sections.$[sec].categories.$[cat].items": { name: itemName },
         },
         $set: {
           lastUpdated: new Date(),
         },
       },
-      { new: true }
+      {
+        arrayFilters: [
+          { "sec.name": sectionName },
+          { "cat.name": categoryName }
+        ],
+        new: true
+      }
     );
 
     if (!menu) {

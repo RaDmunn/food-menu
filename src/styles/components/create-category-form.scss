@@ -1,0 +1,168 @@
+@import "../variables";
+
+.create-category-form {
+  background: $neutral-white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba($text-primary, 0.08);
+  border: 1px solid $border-light;
+  max-width: 600px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: 32px;
+    text-align: center;
+
+    h3 {
+      font-family: $Main-font;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-family: $Main-font;
+      color: $text-secondary;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__label {
+    font-family: $Main-font;
+    font-weight: 500;
+    color: $text-primary;
+    font-size: 0.9rem;
+  }
+
+  &__input {
+    padding: 16px 20px;
+    border: 2px solid $border-light;
+    border-radius: 12px;
+    font-family: $Main-font;
+    font-size: 1rem;
+    color: $text-primary;
+    background: $neutral-white;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-orange;
+      box-shadow: 0 0 0 3px rgba($primary-orange, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+
+    &--error {
+      border-color: #dc3545;
+    }
+  }
+
+  &__textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: $Main-font;
+  }
+
+  &__error {
+    display: block;
+    color: #dc3545;
+    font-family: $Main-font;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  &__help {
+    color: $text-muted;
+    font-family: $Main-font;
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 24px;
+    border-top: 1px solid $border-light;
+
+    @media (max-width: $mobile) {
+      flex-direction: column-reverse;
+    }
+  }
+
+  &__button {
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-family: $Main-font;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    min-width: 120px;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &--primary {
+      background: $primary-orange;
+      color: $neutral-white;
+
+      &:hover:not(:disabled) {
+        background: darken($primary-orange, 8%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba($primary-orange, 0.3);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+    }
+
+    &--secondary {
+      background: transparent;
+      color: $text-secondary;
+      border: 2px solid $border-light;
+
+      &:hover:not(:disabled) {
+        background: rgba($text-secondary, 0.05);
+        border-color: $text-secondary;
+        color: $text-primary;
+      }
+    }
+
+    @media (max-width: $mobile) {
+      min-width: 100%;
+    }
+  }
+
+  @media (max-width: $tablet) {
+    padding: 24px;
+    margin: 0 16px;
+  }
+
+  @media (max-width: $mobile) {
+    padding: 20px;
+    margin: 0 12px;
+  }
+}

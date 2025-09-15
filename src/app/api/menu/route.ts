@@ -58,20 +58,14 @@ export async function GET(request: NextRequest) {
     }
 
     if (category) {
-      // Get specific category from menus
-      query["categories.name"] = category;
-      menus = await Menu.find(query, {
-        "categories.$": 1,
-        currency: 1,
-        restaurant: 1,
-        name: 1,
-        description: 1,
-      }).populate("restaurant", "name");
+      // Get specific category from menus (now within sections)
+      query["sections.categories.name"] = category;
+      menus = await Menu.find(query).populate("restaurant", "name");
     } else if (search) {
-      // Search in menu items
+      // Search in menu items (now within sections)
       query.$or = [
-        { "categories.items.name": new RegExp(search, "i") },
-        { "categories.items.description": new RegExp(search, "i") },
+        { "sections.categories.items.name": new RegExp(search, "i") },
+        { "sections.categories.items.description": new RegExp(search, "i") },
         { name: new RegExp(search, "i") },
         { description: new RegExp(search, "i") },
       ];
@@ -85,17 +79,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No menus found" }, { status: 404 });
     }
 
-    // Filter active categories and available items for each menu
+    // Filter active sections, categories and available items for each menu
     const filteredMenus = menus.map((menu: any) => ({
       ...menu.toObject(),
-      categories: menu.categories
-        .filter((cat: { isActive: boolean }) => cat.isActive)
-        .map((cat: { items: { status: string }[]; sortOrder?: number }) => ({
-          ...cat,
-          items: cat.items.filter(
-            (item: { status: string }) =>
-              item.status === MenuItemStatus.AVAILABLE
-          ),
+      sections: menu.sections
+        .filter((section: { isActive: boolean }) => section.isActive)
+        .map((section: any) => ({
+          ...section,
+          categories: section.categories
+            .filter((cat: { isActive: boolean }) => cat.isActive)
+            .map((cat: { items: { status: string }[]; sortOrder?: number }) => ({
+              ...cat,
+              items: cat.items.filter(
+                (item: { status: string }) =>
+                  item.status === MenuItemStatus.AVAILABLE
+              ),
+            }))
+            .sort(
+              (a: { sortOrder?: number }, b: { sortOrder?: number }) =>
+                (a.sortOrder || 0) - (b.sortOrder || 0)
+            ),
         }))
         .sort(
           (a: { sortOrder?: number }, b: { sortOrder?: number }) =>
@@ -106,35 +109,59 @@ export async function GET(request: NextRequest) {
     // If requesting a specific menu by name, return single menu
     if (menuName && filteredMenus.length === 1) {
       const menu = filteredMenus[0];
+      const totalCategories = menu.sections.reduce(
+        (sum: number, section: { categories: unknown[] }) => sum + section.categories.length,
+        0
+      );
+      const totalItems = menu.sections.reduce(
+        (sum: number, section: { categories: { items: unknown[] }[] }) =>
+          sum + section.categories.reduce(
+            (catSum: number, cat: { items: unknown[] }) => catSum + cat.items.length,
+            0
+          ),
+        0
+      );
+
       return NextResponse.json({
         menu,
-        totalCategories: menu.categories.length,
-        totalItems: menu.categories.reduce(
-          (sum: number, cat: { items: unknown[] }) => sum + cat.items.length,
-          0
-        ),
+        totalSections: menu.sections.length,
+        totalCategories,
+        totalItems,
       });
     }
 
     // Return all menus for the restaurant
+    const totalSections = filteredMenus.reduce(
+      (sum: number, menu: { sections: unknown[] }) => sum + menu.sections.length,
+      0
+    );
+    const totalCategories = filteredMenus.reduce(
+      (sum: number, menu: { sections: { categories: unknown[] }[] }) =>
+        sum + menu.sections.reduce(
+          (secSum: number, section: { categories: unknown[] }) => secSum + section.categories.length,
+          0
+        ),
+      0
+    );
+    const totalItems = filteredMenus.reduce(
+      (sum: number, menu: { sections: { categories: { items: unknown[] }[] }[] }) =>
+        sum + menu.sections.reduce(
+          (secSum: number, section: { categories: { items: unknown[] }[] }) =>
+            secSum + section.categories.reduce(
+              (catSum: number, cat: { items: unknown[] }) => catSum + cat.items.length,
+              0
+            ),
+          0
+        ),
+      0
+    );
+
     return NextResponse.json({
       menus: filteredMenus,
       totalMenus: filteredMenus.length,
-      totalCategories: filteredMenus.reduce(
-        (sum: number, menu: { categories: unknown[] }) =>
-          sum + menu.categories.length,
-        0
-      ),
-      totalItems: filteredMenus.reduce(
-        (sum: number, menu: { categories: { items: unknown[] }[] }) =>
-          sum +
-          menu.categories.reduce(
-            (catSum: number, cat: { items: unknown[] }) =>
-              catSum + cat.items.length,
-            0
-          ),
-        0
-      ),
+      totalSections,
+      totalCategories,
+      totalItems,
     });
   } catch (error: unknown) {
     console.error("Get menu error:", error);
@@ -158,12 +185,12 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { restaurant, name, description, currency, categories } = body;
+    const { restaurant, name, description, currency, sections } = body;
 
     // Validate required fields
-    if (!restaurant || !name || !categories || !Array.isArray(categories)) {
+    if (!restaurant || !name) {
       return NextResponse.json(
-        { error: "Restaurant, menu name, and categories array are required" },
+        { error: "Restaurant and menu name are required" },
         { status: 400 }
       );
     }
@@ -193,7 +220,9 @@ export async function POST(request: NextRequest) {
       // Update existing menu
       menu.description = description || menu.description;
       menu.currency = currency || menu.currency || "EUR";
-      menu.categories = categories;
+      if (sections && Array.isArray(sections)) {
+        menu.sections = sections;
+      }
       menu.lastUpdated = new Date();
     } else {
       // Create new menu
@@ -202,7 +231,7 @@ export async function POST(request: NextRequest) {
         name,
         description: description || "",
         currency: currency || "EUR",
-        categories,
+        sections: sections || [],
         isActive: true,
       });
     }
