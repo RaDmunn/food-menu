@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export interface MenuFormData {
   name: string;
@@ -67,6 +67,26 @@ export default function CreateMenuForm({
   );
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [isRestaurantSelectOpen, setIsRestaurantSelectOpen] = useState(false);
+  const restaurantSelectRef = useRef<HTMLDivElement>(null);
+
+  const selectedRestaurantObj = restaurants.find(r => r._id === selectedRestaurant);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (restaurantSelectRef.current && !restaurantSelectRef.current.contains(event.target as Node)) {
+        setIsRestaurantSelectOpen(false);
+      }
+    }
+
+    if (isRestaurantSelectOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isRestaurantSelectOpen]);
 
   const validateForm = (): boolean => {
     const newErrors: {[key: string]: string} = {};
@@ -110,24 +130,53 @@ export default function CreateMenuForm({
       <form onSubmit={handleSubmit} className="create-menu-form__form">
         <div className="create-menu-form__field">
           <label className="create-menu-form__label">Restaurant *</label>
-          <select
-            className={`create-menu-form__select ${errors.restaurant ? 'create-menu-form__input--error' : ''}`}
-            value={selectedRestaurant}
-            onChange={(e) => {
-              setSelectedRestaurant(e.target.value);
-              if (errors.restaurant) {
-                setErrors(prev => ({ ...prev, restaurant: '' }));
-              }
-            }}
-            required
-          >
-            <option value="">Select a restaurant</option>
-            {restaurants.map(restaurant => (
-              <option key={restaurant._id} value={restaurant._id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
+          <div className="create-menu-form__custom-select" ref={restaurantSelectRef}>
+            <button
+              type="button"
+              className={`create-menu-form__custom-select-trigger ${errors.restaurant ? 'create-menu-form__custom-select-trigger--error' : ''}`}
+              onClick={() => setIsRestaurantSelectOpen(!isRestaurantSelectOpen)}
+            >
+              <span>{selectedRestaurantObj?.name || "Select a restaurant"}</span>
+              <svg
+                className={`create-menu-form__custom-select-arrow ${
+                  isRestaurantSelectOpen ? "create-menu-form__custom-select-arrow--open" : ""
+                }`}
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </button>
+
+            {isRestaurantSelectOpen && (
+              <div className="create-menu-form__custom-select-dropdown">
+                {restaurants.map((restaurant) => (
+                  <button
+                    key={restaurant._id}
+                    type="button"
+                    className={`create-menu-form__custom-select-option ${
+                      selectedRestaurant === restaurant._id
+                        ? "create-menu-form__custom-select-option--selected"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedRestaurant(restaurant._id);
+                      setIsRestaurantSelectOpen(false);
+                      if (errors.restaurant) {
+                        setErrors(prev => ({ ...prev, restaurant: '' }));
+                      }
+                    }}
+                  >
+                    {restaurant.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {errors.restaurant && <span className="create-menu-form__error">{errors.restaurant}</span>}
         </div>
 

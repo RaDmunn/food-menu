@@ -66,11 +66,11 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { restaurantId, categoryName, description, sortOrder } = body;
+    const { restaurantId, menuName, categoryName, description, sortOrder } = body;
 
-    if (!restaurantId || !categoryName) {
+    if (!restaurantId || !menuName || !categoryName) {
       return NextResponse.json(
-        { error: "Restaurant ID and category name are required" },
+        { error: "Restaurant ID, menu name, and category name are required" },
         { status: 400 }
       );
     }
@@ -84,16 +84,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find or create menu
-    let menu = await Menu.findOne({ restaurant: restaurantId });
+    // Find specific menu by restaurant and name
+    let menu = await Menu.findOne({ restaurant: restaurantId, name: menuName });
 
     if (!menu) {
-      menu = new Menu({
-        restaurant: restaurantId,
-        currency: "EUR",
-        categories: [],
-        isActive: true,
-      });
+      return NextResponse.json(
+        { error: "Menu not found. Please create the menu first." },
+        { status: 404 }
+      );
     }
 
     // Check if category already exists

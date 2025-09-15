@@ -66,6 +66,8 @@ export interface IMenuCategory {
 // Interface for complete menu
 export interface IMenu extends Document {
   restaurant: mongoose.Types.ObjectId; // Reference to restaurant
+  name: string; // Menu name (e.g., "Breakfast Menu", "Dinner Menu", "Wine List")
+  description?: string; // Optional menu description
   currency: string;
   categories: IMenuCategory[];
   isActive: boolean;
@@ -218,6 +220,17 @@ const MenuSchema = new Schema<IMenu>(
       ref: "Restaurant",
       required: [true, "Restaurant is required"],
     },
+    name: {
+      type: String,
+      required: [true, "Menu name is required"],
+      trim: true,
+      maxlength: [100, "Menu name cannot exceed 100 characters"],
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Menu description cannot exceed 500 characters"],
+    },
     currency: {
       type: String,
       required: [true, "Currency is required"],
@@ -241,9 +254,11 @@ const MenuSchema = new Schema<IMenu>(
 
 // Indexes for search optimization
 MenuSchema.index({ restaurant: 1 }); // Index for restaurant queries
-MenuSchema.index({ restaurant: 1, name: 1 }, { unique: true }); // Unique menu name per restaurant
+MenuSchema.index({ restaurant: 1, name: 1 }, { unique: true }); // Unique menu name per restaurant (allows multiple menus)
+MenuSchema.index({ restaurant: 1, isActive: 1 }); // Index for active menus per restaurant
 MenuSchema.index({ isActive: 1 });
 MenuSchema.index({ lastUpdated: -1 });
+MenuSchema.index({ name: "text", description: "text" }); // Text search for menu names and descriptions
 MenuSchema.index({ "categories.name": 1 });
 MenuSchema.index({
   "categories.items.name": "text",
@@ -283,7 +298,14 @@ MenuItemSchema.methods.getDietaryTags = function () {
 MenuSchema.statics.findByRestaurant = function (
   restaurantId: mongoose.Types.ObjectId
 ) {
-  return this.findOne({ restaurant: restaurantId });
+  return this.find({ restaurant: restaurantId });
+};
+
+MenuSchema.statics.findMenuByName = function (
+  restaurantId: mongoose.Types.ObjectId,
+  menuName: string
+) {
+  return this.findOne({ restaurant: restaurantId, name: menuName });
 };
 
 MenuSchema.statics.findActiveMenus = function () {
@@ -292,39 +314,48 @@ MenuSchema.statics.findActiveMenus = function () {
 
 MenuSchema.statics.findByCategory = function (
   restaurantId: mongoose.Types.ObjectId,
-  categoryName: string
+  categoryName: string,
+  menuName?: string
 ) {
-  return this.findOne(
-    { restaurant: restaurantId },
-    { "categories.$": 1 },
-    { "categories.name": categoryName }
-  );
+  const query: any = { restaurant: restaurantId };
+  if (menuName) {
+    query.name = menuName;
+  }
+  return this.find(query, { "categories.$": 1 }, { "categories.name": categoryName });
 };
 
 MenuSchema.statics.getCategoriesForRestaurant = function (
-  restaurantId: mongoose.Types.ObjectId
+  restaurantId: mongoose.Types.ObjectId,
+  menuName?: string
 ) {
-  return this.findOne(
-    { restaurant: restaurantId },
-    {
-      "categories.name": 1,
-      "categories.isActive": 1,
-      "categories.sortOrder": 1,
-    }
-  );
+  const query: any = { restaurant: restaurantId };
+  if (menuName) {
+    query.name = menuName;
+  }
+  return this.find(query, {
+    name: 1,
+    "categories.name": 1,
+    "categories.isActive": 1,
+    "categories.sortOrder": 1,
+  });
 };
 
 MenuSchema.statics.searchMenuItems = function (
   restaurantId: mongoose.Types.ObjectId,
-  searchTerm: string
+  searchTerm: string,
+  menuName?: string
 ) {
-  return this.findOne({
+  const query: any = {
     restaurant: restaurantId,
     $or: [
       { "categories.items.name": new RegExp(searchTerm, "i") },
       { "categories.items.description": new RegExp(searchTerm, "i") },
     ],
-  });
+  };
+  if (menuName) {
+    query.name = menuName;
+  }
+  return this.find(query);
 };
 
 // Middleware for menu items
@@ -365,11 +396,12 @@ MenuSchema.pre("save", function (this: IMenu, next) {
 
 // Interface for static methods
 export interface IMenuModel extends mongoose.Model<IMenu> {
-  findByRestaurant(restaurantId: mongoose.Types.ObjectId): mongoose.Query<IMenu | null, IMenu>;
+  findByRestaurant(restaurantId: mongoose.Types.ObjectId): mongoose.Query<IMenu[], IMenu>;
+  findMenuByName(restaurantId: mongoose.Types.ObjectId, menuName: string): mongoose.Query<IMenu | null, IMenu>;
   findActiveMenus(): mongoose.Query<IMenu[], IMenu>;
-  findByCategory(restaurantId: mongoose.Types.ObjectId, categoryName: string): mongoose.Query<IMenu | null, IMenu>;
-  getCategoriesForRestaurant(restaurantId: mongoose.Types.ObjectId): mongoose.Query<IMenu | null, IMenu>;
-  searchMenuItems(restaurantId: mongoose.Types.ObjectId, searchTerm: string): mongoose.Query<IMenu | null, IMenu>;
+  findByCategory(restaurantId: mongoose.Types.ObjectId, categoryName: string, menuName?: string): mongoose.Query<IMenu[], IMenu>;
+  getCategoriesForRestaurant(restaurantId: mongoose.Types.ObjectId, menuName?: string): mongoose.Query<IMenu[], IMenu>;
+  searchMenuItems(restaurantId: mongoose.Types.ObjectId, searchTerm: string, menuName?: string): mongoose.Query<IMenu[], IMenu>;
 }
 
 // Export model

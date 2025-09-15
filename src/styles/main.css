@@ -2824,7 +2824,181 @@ a {
     width: 100%;
   }
 }
+.create-menu-form__custom-select {
+  position: relative;
+  width: 100%;
+}
+.create-menu-form__custom-select-trigger {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-family: "SourceSans3", sans-serif;
+  font-size: 1rem;
+  color: #212121;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+.create-menu-form__custom-select-trigger:hover {
+  border-color: rgba(255, 107, 53, 0.5);
+}
+.create-menu-form__custom-select-trigger:focus {
+  outline: none;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+.create-menu-form__custom-select-trigger--error {
+  border-color: #dc3545;
+}
+.create-menu-form__custom-select-arrow {
+  color: #9e9e9e;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+.create-menu-form__custom-select-arrow--open {
+  transform: rotate(180deg);
+  color: #ff6b35;
+}
+.create-menu-form__custom-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.1);
+  z-index: 10;
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.create-menu-form__custom-select-option {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  font-family: "SourceSans3", sans-serif;
+  font-size: 0.95rem;
+  color: #212121;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(224, 224, 224, 0.5);
+}
+.create-menu-form__custom-select-option:hover {
+  background: rgba(255, 107, 53, 0.05);
+  color: #ff6b35;
+}
+.create-menu-form__custom-select-option--selected {
+  background: rgba(255, 107, 53, 0.1);
+  color: #ff6b35;
+  font-weight: 500;
+}
+.create-menu-form__custom-select-option--selected:hover {
+  background: rgba(255, 107, 53, 0.15);
+}
+.create-menu-form__custom-select-option:last-child {
+  border-bottom: none;
+}
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SourceSans3";
+  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+.loading-spinner-container--fullscreen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(245, 245, 245, 0.3) 0%, white 50%, rgba(245, 245, 245, 0.2) 100%);
+}
+
+.loading-spinner {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.loading-spinner__circle {
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.loading-spinner--small .loading-spinner__circle {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 107, 53, 0.2);
+  border-top: 3px solid #ff6b35;
+}
+.loading-spinner--medium .loading-spinner__circle {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 107, 53, 0.2);
+  border-top: 4px solid #ff6b35;
+}
+.loading-spinner--large .loading-spinner__circle {
+  width: 56px;
+  height: 56px;
+  border: 5px solid rgba(255, 107, 53, 0.2);
+  border-top: 5px solid #ff6b35;
+}
+.loading-spinner--primary .loading-spinner__circle {
+  border-color: rgba(255, 107, 53, 0.2);
+  border-top-color: #ff6b35;
+}
+.loading-spinner--secondary .loading-spinner__circle {
+  border-color: rgba(45, 80, 22, 0.2);
+  border-top-color: #2d5016;
+}
+.loading-spinner--white .loading-spinner__circle {
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+}
+.loading-spinner__text {
+  font-family: "SourceSans3", sans-serif;
+  color: #424242;
+  margin: 0;
+  font-size: 1rem;
+  text-align: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 @font-face {
   font-family: "Montserrat";
   src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");

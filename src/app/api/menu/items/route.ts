@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       restaurantId,
+      menuName,
       categoryName,
       name,
       description,
@@ -42,11 +43,11 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!restaurantId || !categoryName || !name || price === undefined) {
+    if (!restaurantId || !menuName || !categoryName || !name || price === undefined) {
       return NextResponse.json(
         {
           error:
-            "Restaurant ID, category name, item name, and price are required",
+            "Restaurant ID, menu name, category name, item name, and price are required",
         },
         { status: 400 }
       );
@@ -61,11 +62,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find menu
-    const menu = await Menu.findOne({ restaurant: restaurantId });
+    // Find specific menu by restaurant and name
+    const menu = await Menu.findOne({ restaurant: restaurantId, name: menuName });
     if (!menu) {
       return NextResponse.json(
-        { error: "Menu not found. Create a menu first." },
+        { error: "Menu not found. Create the menu first." },
         { status: 404 }
       );
     }
