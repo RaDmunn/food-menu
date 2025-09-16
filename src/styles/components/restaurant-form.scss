@@ -1,4 +1,5 @@
-@import "../variables";
+@use "../_variables.scss" as *;
+@use "sass:color";
 
 .restaurant-form {
   max-width: 800px;
@@ -419,7 +420,7 @@
     min-width: 200px;
 
     &:hover:not(:disabled) {
-      background: darken($primary-orange, 5%);
+      background: color.scale($primary-orange, $lightness: -5%);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba($primary-orange, 0.3);
     }

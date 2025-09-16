@@ -1,4 +1,5 @@
-@import "../variables";
+@use "../_variables.scss" as *;
+@use "sass:color";
 
 .section-card {
   background: $neutral-white;
@@ -160,7 +161,7 @@
     transition: all 0.2s ease;
 
     &:hover {
-      background: darken($primary-orange, 8%);
+      background: color.scale($primary-orange, $lightness: -8%);
       transform: translateY(-1px);
     }
 

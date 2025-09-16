@@ -1967,7 +1967,7 @@ a {
   transition: all 0.2s ease;
 }
 .user-dashboard__restaurant-card-edit-btn:hover {
-  background: rgb(255, 88.3168316832, 27.5);
+  background: rgb(255, 95.7168316832, 37.6);
   transform: translateY(-1px);
 }
 .user-dashboard__restaurant-card-status {
@@ -2596,18 +2596,6 @@ a {
   min-width: 80px;
 }
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
 .restaurant-form {
   max-width: 800px;
   margin: 0 auto;
@@ -2975,7 +2963,7 @@ a {
   min-width: 200px;
 }
 .restaurant-form__submit-btn:hover:not(:disabled) {
-  background: rgb(255, 88.3168316832, 27.5);
+  background: rgb(255, 95.7168316832, 37.6);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
 }
@@ -2995,18 +2983,6 @@ a {
     opacity: 1;
     transform: translateY(0);
   }
-}
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
 }
 .create-menu-form {
   background: #ffffff;
@@ -3191,7 +3167,7 @@ a {
   min-width: 140px;
 }
 .create-menu-form__submit-btn:hover:not(:disabled) {
-  background: rgb(255, 88.3168316832, 27.5);
+  background: rgb(255, 95.7168316832, 37.6);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
 }
@@ -3301,18 +3277,6 @@ a {
     opacity: 1;
     transform: translateY(0);
   }
-}
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
 }
 .create-section-form {
   background: #ffffff;
@@ -3429,7 +3393,7 @@ a {
   color: #ffffff;
 }
 .create-section-form__button--primary:hover:not(:disabled) {
-  background: rgb(255, 77.1069306931, 12.2);
+  background: rgb(255, 88.9469306931, 28.36);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
 }
@@ -3502,14 +3466,16 @@ a {
   border-radius: 6px;
   background: rgba(245, 245, 245, 0.3);
 }
-.create-section-form__schedule-item select, .create-section-form__schedule-item input {
+.create-section-form__schedule-item select,
+.create-section-form__schedule-item input {
   padding: 8px 12px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   font-family: "SourceSans3", sans-serif;
   font-size: 0.9rem;
 }
-.create-section-form__schedule-item select:focus, .create-section-form__schedule-item input:focus {
+.create-section-form__schedule-item select:focus,
+.create-section-form__schedule-item input:focus {
   outline: none;
   border-color: #ff6b35;
 }
@@ -3544,7 +3510,7 @@ a {
   margin-top: 8px;
 }
 .create-section-form__add-btn:hover {
-  background: rgb(255, 69.6336633663, 2);
+  background: rgb(255, 84.4336633663, 22.2);
 }
 .create-section-form__row {
   display: grid;
@@ -3564,18 +3530,6 @@ a {
   font-style: italic;
 }
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
 .create-category-form {
   background: #ffffff;
   border-radius: 16px;
@@ -3691,7 +3645,7 @@ a {
   color: #ffffff;
 }
 .create-category-form__button--primary:hover:not(:disabled) {
-  background: rgb(255, 77.1069306931, 12.2);
+  background: rgb(255, 88.9469306931, 28.36);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
 }
@@ -3726,18 +3680,6 @@ a {
   }
 }
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
 .create-item-form {
   background: #ffffff;
   border-radius: 16px;
@@ -4013,7 +3955,7 @@ a {
   margin-top: 8px;
 }
 .create-item-form__add-btn:hover {
-  background: rgb(255, 69.6336633663, 2);
+  background: rgb(255, 84.4336633663, 22.2);
 }
 .create-item-form__tags-input {
   display: flex;
@@ -4047,7 +3989,7 @@ a {
   margin-left: 4px;
 }
 .create-item-form__tag-remove:hover {
-  color: rgb(206, 55.0693069307, 0);
+  color: rgb(246.4, 65.8693069307, 0);
 }
 .create-item-form__nutrition-grid {
   display: grid;
@@ -4115,7 +4057,7 @@ a {
   transition: all 0.2s ease;
 }
 .create-item-form__tag-input button:hover {
-  background: rgb(255, 77.1069306931, 12.2);
+  background: rgb(255, 88.9469306931, 28.36);
 }
 .create-item-form__tag-input button:disabled {
   opacity: 0.6;
@@ -4168,7 +4110,7 @@ a {
   color: #ffffff;
 }
 .create-item-form__button--primary:hover:not(:disabled) {
-  background: rgb(255, 77.1069306931, 12.2);
+  background: rgb(255, 88.9469306931, 28.36);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
 }
@@ -4209,18 +4151,6 @@ a {
   }
 }
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
 .section-card {
   background: #ffffff;
   border-radius: 12px;
@@ -4360,7 +4290,7 @@ a {
   transition: all 0.2s ease;
 }
 .section-card__add-category-btn:hover {
-  background: rgb(255, 77.1069306931, 12.2);
+  background: rgb(255, 88.9469306931, 28.36);
   transform: translateY(-1px);
 }
 .section-card__add-category-btn svg {
@@ -4574,18 +4504,6 @@ a {
   }
 }
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
 .loading-spinner-container {
   display: flex;
   flex-direction: column;
@@ -4653,18 +4571,6 @@ a {
     transform: rotate(360deg);
   }
 }
-@font-face {
-  font-family: "Montserrat";
-  src: url("./fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "SourceSans3";
-  src: url("./fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}
 .menu-management {
   min-height: 100vh;
   background: #f5f5f5;
@@ -4726,7 +4632,7 @@ a {
   transition: all 0.2s ease;
 }
 .menu-management__error .btn-primary:hover {
-  background: rgb(255, 88.3168316832, 27.5);
+  background: rgb(255, 95.7168316832, 37.6);
   transform: translateY(-1px);
 }
 .menu-management__header {
@@ -4752,7 +4658,7 @@ a {
   gap: 8px;
 }
 .menu-management__back-btn:hover {
-  color: rgb(255, 69.6336633663, 2);
+  color: rgb(255, 84.4336633663, 22.2);
   transform: translateX(-2px);
 }
 .menu-management__title-section {
@@ -4837,7 +4743,7 @@ a {
   transition: all 0.2s ease;
 }
 .menu-management__section-header .btn-primary:hover {
-  background: rgb(255, 88.3168316832, 27.5);
+  background: rgb(255, 95.7168316832, 37.6);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
 }
@@ -4878,7 +4784,7 @@ a {
   transition: all 0.2s ease;
 }
 .menu-management__empty .btn-primary:hover {
-  background: rgb(255, 88.3168316832, 27.5);
+  background: rgb(255, 95.7168316832, 37.6);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
 }

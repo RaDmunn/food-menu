@@ -1,4 +1,5 @@
-@import "../variables";
+@use "../_variables.scss" as *;
+@use "sass:color";
 
 .create-item-form {
   background: $neutral-white;
@@ -313,7 +314,7 @@
     margin-top: 8px;
 
     &:hover {
-      background: darken($primary-orange, 10%);
+      background: color.scale($primary-orange, $lightness: -10%);
     }
   }
 
@@ -352,7 +353,7 @@
     margin-left: 4px;
 
     &:hover {
-      color: darken($primary-orange, 20%);
+      color: color.scale($primary-orange, $lightness: -20%);
     }
   }
 
@@ -425,7 +426,7 @@
       transition: all 0.2s ease;
 
       &:hover {
-        background: darken($primary-orange, 8%);
+        background: color.scale($primary-orange, $lightness: -8%);
       }
 
       &:disabled {
@@ -485,7 +486,7 @@
       color: $neutral-white;
 
       &:hover:not(:disabled) {
-        background: darken($primary-orange, 8%);
+        background: color.scale($primary-orange, $lightness: -8%);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba($primary-orange, 0.3);
       }

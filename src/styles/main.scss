@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "_variables.scss" as *;
 @use "mixins";
 @use "reset";
@@ -9,7 +10,7 @@
 @use "./users/user.scss";
 @use "./components/create-restaurant-modal.scss";
 @use "./components/restaurant-form.scss";
-@use "./components/create-menu-form.scss";
+@use "./menu/create-menu-form.scss";
 @use "./components/create-section-form.scss";
 @use "./components/create-category-form.scss";
 @use "./components/create-item-form.scss";

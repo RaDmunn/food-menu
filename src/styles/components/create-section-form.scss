@@ -1,4 +1,5 @@
-@import "../variables";
+@use "../_variables.scss" as *;
+@use "sass:color";
 
 .create-section-form {
   background: $neutral-white;
@@ -129,7 +130,7 @@
       color: $neutral-white;
 
       &:hover:not(:disabled) {
-        background: darken($primary-orange, 8%);
+        background: color.scale($primary-orange, $lightness: -8%);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba($primary-orange, 0.3);
       }
@@ -210,7 +211,8 @@
     border-radius: 6px;
     background: rgba($neutral-light-gray, 0.3);
 
-    select, input {
+    select,
+    input {
       padding: 8px 12px;
       border: 1px solid $border-light;
       border-radius: 4px;
@@ -258,7 +260,7 @@
     margin-top: 8px;
 
     &:hover {
-      background: darken($primary-orange, 10%);
+      background: color.scale($primary-orange, $lightness: -10%);
     }
   }
 
