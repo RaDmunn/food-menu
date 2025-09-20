@@ -3,10 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import CreateSectionForm, { SectionFormData } from "@/components/CreateSectionForm";
-import CreateCategoryForm, { CategoryFormData } from "@/components/CreateCategoryForm";
-import CreateItemForm, { ItemFormData } from "@/components/CreateItemForm";
-import SectionCard, { Section, Category } from "@/components/SectionCard";
+import CreateSectionForm, {
+  SectionFormData,
+} from "@/components/menu/CreateSectionForm";
+import CreateCategoryForm, {
+  CategoryFormData,
+} from "@/components/menu/CreateCategoryForm";
+import CreateItemForm, { ItemFormData } from "@/components/menu/CreateItemForm";
+import SectionCard, { Section, Category } from "@/components/menu/SectionCard";
 
 interface Menu {
   _id: string;
@@ -35,11 +39,14 @@ export default function MenuManagementPage() {
   const [editingSection, setEditingSection] = useState<Section | null>(null);
   const [showCreateCategoryForm, setShowCreateCategoryForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [currentSectionForCategory, setCurrentSectionForCategory] = useState<string>('');
+  const [currentSectionForCategory, setCurrentSectionForCategory] =
+    useState<string>("");
   const [showCreateItemForm, setShowCreateItemForm] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
-  const [currentSectionForItem, setCurrentSectionForItem] = useState<string>('');
-  const [currentCategoryForItem, setCurrentCategoryForItem] = useState<string>('');
+  const [currentSectionForItem, setCurrentSectionForItem] =
+    useState<string>("");
+  const [currentCategoryForItem, setCurrentCategoryForItem] =
+    useState<string>("");
 
   useEffect(() => {
     // Check authentication
@@ -158,7 +165,11 @@ export default function MenuManagementPage() {
   };
 
   const handleDeleteSection = async (sectionName: string) => {
-    if (!confirm(`Are you sure you want to delete the section "${sectionName}"? This will also delete all categories and items within it.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete the section "${sectionName}"? This will also delete all categories and items within it.`
+      )
+    ) {
       return;
     }
 
@@ -198,8 +209,15 @@ export default function MenuManagementPage() {
     setShowCreateCategoryForm(true);
   };
 
-  const handleDeleteCategory = async (sectionName: string, categoryName: string) => {
-    if (!confirm(`Are you sure you want to delete the category "${categoryName}"? This will also delete all items within it.`)) {
+  const handleDeleteCategory = async (
+    sectionName: string,
+    categoryName: string
+  ) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete the category "${categoryName}"? This will also delete all items within it.`
+      )
+    ) {
       return;
     }
 
@@ -249,7 +267,7 @@ export default function MenuManagementPage() {
       if (response.ok) {
         await loadMenu();
         setShowCreateCategoryForm(false);
-        setCurrentSectionForCategory('');
+        setCurrentSectionForCategory("");
       } else {
         const errorData = await response.json();
         alert(`Failed to create category: ${errorData.error}`);
@@ -286,7 +304,7 @@ export default function MenuManagementPage() {
         await loadMenu();
         setShowCreateCategoryForm(false);
         setEditingCategory(null);
-        setCurrentSectionForCategory('');
+        setCurrentSectionForCategory("");
       } else {
         const errorData = await response.json();
         alert(`Failed to update category: ${errorData.error}`);
@@ -305,14 +323,22 @@ export default function MenuManagementPage() {
     setShowCreateItemForm(true);
   };
 
-  const handleEditItem = (sectionName: string, categoryName: string, item: any) => {
+  const handleEditItem = (
+    sectionName: string,
+    categoryName: string,
+    item: any
+  ) => {
     setCurrentSectionForItem(sectionName);
     setCurrentCategoryForItem(categoryName);
     setEditingItem(item);
     setShowCreateItemForm(true);
   };
 
-  const handleDeleteItem = async (sectionName: string, categoryName: string, itemName: string) => {
+  const handleDeleteItem = async (
+    sectionName: string,
+    categoryName: string,
+    itemName: string
+  ) => {
     if (!confirm(`Are you sure you want to delete the item "${itemName}"?`)) {
       return;
     }
@@ -362,8 +388,8 @@ export default function MenuManagementPage() {
       if (response.ok) {
         await loadMenu();
         setShowCreateItemForm(false);
-        setCurrentSectionForItem('');
-        setCurrentCategoryForItem('');
+        setCurrentSectionForItem("");
+        setCurrentCategoryForItem("");
       } else {
         const errorData = await response.json();
         alert(`Failed to create item: ${errorData.error}`);
@@ -399,8 +425,8 @@ export default function MenuManagementPage() {
         await loadMenu();
         setShowCreateItemForm(false);
         setEditingItem(null);
-        setCurrentSectionForItem('');
-        setCurrentCategoryForItem('');
+        setCurrentSectionForItem("");
+        setCurrentCategoryForItem("");
       } else {
         const errorData = await response.json();
         alert(`Failed to update item: ${errorData.error}`);
@@ -416,24 +442,24 @@ export default function MenuManagementPage() {
     setEditingSection(null);
     setShowCreateCategoryForm(false);
     setEditingCategory(null);
-    setCurrentSectionForCategory('');
+    setCurrentSectionForCategory("");
     setShowCreateItemForm(false);
     setEditingItem(null);
-    setCurrentSectionForItem('');
-    setCurrentCategoryForItem('');
+    setCurrentSectionForItem("");
+    setCurrentCategoryForItem("");
   };
 
   const handleCategoryFormCancel = () => {
     setShowCreateCategoryForm(false);
     setEditingCategory(null);
-    setCurrentSectionForCategory('');
+    setCurrentSectionForCategory("");
   };
 
   const handleItemFormCancel = () => {
     setShowCreateItemForm(false);
     setEditingItem(null);
-    setCurrentSectionForItem('');
-    setCurrentCategoryForItem('');
+    setCurrentSectionForItem("");
+    setCurrentCategoryForItem("");
   };
 
   if (loading) {
@@ -503,28 +529,40 @@ export default function MenuManagementPage() {
             <CreateSectionForm
               restaurantId={menu.restaurant._id}
               menuName={menu.name}
-              onSubmit={editingSection ? handleUpdateSection : handleCreateSection}
+              onSubmit={
+                editingSection ? handleUpdateSection : handleCreateSection
+              }
               onCancel={handleFormCancel}
-              editingSection={editingSection ? {
-                name: editingSection.name,
-                description: editingSection.description || '',
-                sortOrder: editingSection.sortOrder,
-                originalName: editingSection.name
-              } : undefined}
+              editingSection={
+                editingSection
+                  ? {
+                      name: editingSection.name,
+                      description: editingSection.description || "",
+                      sortOrder: editingSection.sortOrder,
+                      originalName: editingSection.name,
+                    }
+                  : undefined
+              }
             />
           ) : showCreateCategoryForm ? (
             <CreateCategoryForm
               restaurantId={menu.restaurant._id}
               menuName={menu.name}
               sectionName={currentSectionForCategory}
-              onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory}
+              onSubmit={
+                editingCategory ? handleUpdateCategory : handleCreateCategory
+              }
               onCancel={handleCategoryFormCancel}
-              editingCategory={editingCategory ? {
-                name: editingCategory.name,
-                description: editingCategory.description || '',
-                sortOrder: editingCategory.sortOrder,
-                originalName: editingCategory.name
-              } : undefined}
+              editingCategory={
+                editingCategory
+                  ? {
+                      name: editingCategory.name,
+                      description: editingCategory.description || "",
+                      sortOrder: editingCategory.sortOrder,
+                      originalName: editingCategory.name,
+                    }
+                  : undefined
+              }
             />
           ) : showCreateItemForm ? (
             <CreateItemForm
@@ -534,10 +572,14 @@ export default function MenuManagementPage() {
               categoryName={currentCategoryForItem}
               onSubmit={editingItem ? handleUpdateItem : handleCreateItem}
               onCancel={handleItemFormCancel}
-              editingItem={editingItem ? {
-                ...editingItem,
-                originalName: editingItem.name
-              } : undefined}
+              editingItem={
+                editingItem
+                  ? {
+                      ...editingItem,
+                      originalName: editingItem.name,
+                    }
+                  : undefined
+              }
             />
           ) : (
             <div className="menu-management__section">

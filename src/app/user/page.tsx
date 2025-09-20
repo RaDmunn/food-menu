@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import RestaurantForm, {
   RestaurantFormData,
-} from "@/components/RestaurantForm";
-import CreateMenuForm, { MenuFormData } from "@/components/CreateMenuForm";
+} from "@/components/restaurant/RestaurantForm";
+import CreateMenuForm, { MenuFormData } from "@/components/menu/CreateMenuForm";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface User {
@@ -283,7 +283,9 @@ export default function UserPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner size="large" text="Loading dashboard..." fullScreen />;
+    return (
+      <LoadingSpinner size="large" text="Loading dashboard..." fullScreen />
+    );
   }
 
   return (
