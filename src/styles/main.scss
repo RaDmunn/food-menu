@@ -17,7 +17,10 @@
 @use "./components/create-item-form.scss";
 @use "./components/section-card.scss";
 @use "./components/loading-spinner.scss";
+@use "./components/custom-select.scss";
 @use "./menu/menu-management.scss";
+@use "./public/restaurant-page.scss";
+@use "./public/menu-page.scss";
 
 * {
   box-sizing: border-box;
