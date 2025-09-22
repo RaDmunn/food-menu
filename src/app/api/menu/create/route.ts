@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       name,
       description: description || "",
       currency: currency || "EUR",
-      categories: [],
+      sections: [],
       isActive,
     });
 

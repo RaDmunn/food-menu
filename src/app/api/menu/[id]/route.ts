@@ -81,12 +81,12 @@ export async function PUT(
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Обновляем меню
-    const updatedMenu = await Menu.findByIdAndUpdate(
-      menuId,
-      { $set: body },
-      { new: true, runValidators: true }
-    ).populate("restaurant", "name");
+    // Обновляем меню (используем save() чтобы сработал middleware для slug)
+    Object.assign(menu, body);
+    const updatedMenu = await menu.save();
+
+    // Populate restaurant после сохранения
+    await updatedMenu.populate("restaurant", "name");
 
     return NextResponse.json({
       message: "Menu updated successfully",

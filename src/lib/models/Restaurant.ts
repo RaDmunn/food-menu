@@ -6,6 +6,7 @@ import {
   IAddress,
   IContact,
 } from "@/lib/types";
+import { generateSlug, generateUniqueSlug } from "@/lib/utils/slug";
 
 // Экспортируем типы для обратной совместимости
 export type {
@@ -19,6 +20,7 @@ export type {
 // Интерфейс для ресторана
 export interface IRestaurant extends Document {
   name: string;
+  slug: string; // URL-friendly название для ссылок
   description?: string;
   owner: mongoose.Types.ObjectId; // Ссылка на пользователя-владельца
   address: IAddress;
@@ -155,6 +157,16 @@ const RestaurantSchema = new Schema<IRestaurant>(
       trim: true,
       maxlength: [100, "Restaurant name cannot exceed 100 characters"],
     },
+    slug: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      maxlength: [100, "Restaurant slug cannot exceed 100 characters"],
+      match: [
+        /^[a-z0-9]+(-[a-z0-9]+)*$/,
+        "Slug must contain only lowercase letters, numbers, and hyphens",
+      ],
+    },
     description: {
       type: String,
       trim: true,
@@ -232,6 +244,7 @@ const RestaurantSchema = new Schema<IRestaurant>(
 
 // Индексы для оптимизации поиска
 RestaurantSchema.index({ name: "text", description: "text" });
+RestaurantSchema.index({ slug: 1 }, { unique: true });
 RestaurantSchema.index({ owner: 1 });
 RestaurantSchema.index({ status: 1 });
 RestaurantSchema.index({ cuisineType: 1 });
@@ -278,15 +291,63 @@ RestaurantSchema.statics.findActiveRestaurants = function () {
   return this.find({ status: RestaurantStatus.ACTIVE });
 };
 
+RestaurantSchema.statics.findBySlug = function (slug: string) {
+  return this.findOne({ slug: slug });
+};
+
 // Middleware
-RestaurantSchema.pre("save", function (next) {
-  // Валидация ценового диапазона
-  if (this.priceRange && this.priceRange.min > this.priceRange.max) {
-    next(new Error("Minimum price cannot be greater than maximum price"));
+RestaurantSchema.pre("save", async function (next) {
+  try {
+    // Генерация slug если он не задан или изменилось название
+    if (!this.slug || this.isModified("name")) {
+      if (!this.name) {
+        return next(new Error("Restaurant name is required to generate slug"));
+      }
+
+      const baseSlug = generateSlug(this.name);
+
+      // Получаем существующие slug'и для проверки уникальности
+      const existingSlugs = await (this.constructor as any)
+        .find({ _id: { $ne: this._id } }, { slug: 1 })
+        .then((docs: any[]) => docs.map((doc: any) => doc.slug));
+
+      this.slug = generateUniqueSlug(baseSlug, existingSlugs);
+    }
+
+    // Проверяем, что slug был сгенерирован
+    if (!this.slug) {
+      return next(new Error("Failed to generate restaurant slug"));
+    }
+
+    // Валидация ценового диапазона
+    if (this.priceRange && this.priceRange.min > this.priceRange.max) {
+      return next(
+        new Error("Minimum price cannot be greater than maximum price")
+      );
+    }
+
+    next();
+  } catch (error) {
+    next(error instanceof Error ? error : new Error("Unknown error occurred"));
   }
-  next();
 });
 
+// Interface for static methods
+export interface IRestaurantModel extends mongoose.Model<IRestaurant> {
+  findByOwner(
+    ownerId: mongoose.Types.ObjectId
+  ): mongoose.Query<IRestaurant[], IRestaurant>;
+  findByCity(city: string): mongoose.Query<IRestaurant[], IRestaurant>;
+  findByCuisine(
+    cuisineType: CuisineType
+  ): mongoose.Query<IRestaurant[], IRestaurant>;
+  findActiveRestaurants(): mongoose.Query<IRestaurant[], IRestaurant>;
+  findBySlug(slug: string): mongoose.Query<IRestaurant | null, IRestaurant>;
+}
+
 // Экспорт модели
-export default mongoose.models.Restaurant ||
-  mongoose.model<IRestaurant>("Restaurant", RestaurantSchema);
+export default (mongoose.models.Restaurant as IRestaurantModel) ||
+  (mongoose.model<IRestaurant, IRestaurantModel>(
+    "Restaurant",
+    RestaurantSchema
+  ) as IRestaurantModel);

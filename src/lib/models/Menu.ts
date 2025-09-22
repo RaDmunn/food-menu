@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { generateSlug, generateUniqueSlug } from "@/lib/utils/slug";
 
 // Enum for menu item status
 export enum MenuItemStatus {
@@ -133,6 +134,7 @@ export interface IMenuSection {
 export interface IMenu extends Document {
   restaurant: mongoose.Types.ObjectId; // Reference to restaurant
   name: string; // Menu name (e.g., "Breakfast Menu", "Dinner Menu", "Wine List")
+  slug: string; // URL-friendly название для ссылок
   description?: string; // Optional menu description
   currency: string;
   sections: IMenuSection[]; // Changed from categories to sections
@@ -185,12 +187,18 @@ const AvailabilityScheduleSchema = new Schema<IAvailabilitySchedule>(
     startTime: {
       type: String,
       required: [true, "Start time is required"],
-      match: [/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"],
+      match: [
+        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+        "Invalid time format (HH:MM)",
+      ],
     },
     endTime: {
       type: String,
       required: [true, "End time is required"],
-      match: [/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"],
+      match: [
+        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+        "Invalid time format (HH:MM)",
+      ],
     },
   },
   { _id: false }
@@ -487,6 +495,16 @@ const MenuSchema = new Schema<IMenu>(
       trim: true,
       maxlength: [100, "Menu name cannot exceed 100 characters"],
     },
+    slug: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      maxlength: [100, "Menu slug cannot exceed 100 characters"],
+      match: [
+        /^[a-z0-9]+(-[a-z0-9]+)*$/,
+        "Slug must contain only lowercase letters, numbers, and hyphens",
+      ],
+    },
     description: {
       type: String,
       trim: true,
@@ -516,6 +534,7 @@ const MenuSchema = new Schema<IMenu>(
 // Indexes for search optimization
 MenuSchema.index({ restaurant: 1 }); // Index for restaurant queries
 MenuSchema.index({ restaurant: 1, name: 1 }, { unique: true }); // Unique menu name per restaurant (allows multiple menus)
+MenuSchema.index({ restaurant: 1, slug: 1 }, { unique: true }); // Unique menu slug per restaurant
 MenuSchema.index({ restaurant: 1, isActive: 1 }); // Index for active menus per restaurant
 MenuSchema.index({ isActive: 1 });
 MenuSchema.index({ lastUpdated: -1 });
@@ -570,6 +589,13 @@ MenuSchema.statics.findMenuByName = function (
   return this.findOne({ restaurant: restaurantId, name: menuName });
 };
 
+MenuSchema.statics.findMenuBySlug = function (
+  restaurantId: mongoose.Types.ObjectId,
+  menuSlug: string
+) {
+  return this.findOne({ restaurant: restaurantId, slug: menuSlug });
+};
+
 MenuSchema.statics.findActiveMenus = function () {
   return this.find({ isActive: true });
 };
@@ -582,7 +608,7 @@ MenuSchema.statics.findBySection = function (
 ) {
   const query: any = {
     restaurant: restaurantId,
-    "sections.name": sectionName
+    "sections.name": sectionName,
   };
   if (menuName) {
     query.name = menuName;
@@ -591,7 +617,7 @@ MenuSchema.statics.findBySection = function (
     name: 1,
     currency: 1,
     restaurant: 1,
-    "sections.$": 1
+    "sections.$": 1,
   });
 };
 
@@ -605,7 +631,7 @@ MenuSchema.statics.findByCategory = function (
   const query: any = {
     restaurant: restaurantId,
     "sections.name": sectionName,
-    "sections.categories.name": categoryName
+    "sections.categories.name": categoryName,
   };
   if (menuName) {
     query.name = menuName;
@@ -639,14 +665,14 @@ MenuSchema.statics.getCategoriesForSection = function (
 ) {
   const query: any = {
     restaurant: restaurantId,
-    "sections.name": sectionName
+    "sections.name": sectionName,
   };
   if (menuName) {
     query.name = menuName;
   }
   return this.find(query, {
     name: 1,
-    "sections.$": 1
+    "sections.$": 1,
   });
 };
 
@@ -689,29 +715,68 @@ MenuItemSchema.pre("save", function (this: IMenuItem, next) {
 });
 
 // Middleware for menu
-MenuSchema.pre("save", function (this: IMenu, next) {
-  // Update lastUpdated timestamp
-  this.lastUpdated = new Date();
+MenuSchema.pre("save", async function (this: IMenu, next) {
+  try {
+    // Генерация slug если он не задан или изменилось название
+    if (!this.slug || this.isModified("name")) {
+      if (!this.name) {
+        return next(new Error("Menu name is required to generate slug"));
+      }
 
-  // Validate that section names are unique within the menu
-  const sectionNames = this.sections.map((section) => section.name.toLowerCase());
-  const uniqueSectionNames = new Set(sectionNames);
+      const baseSlug = generateSlug(this.name);
 
-  if (sectionNames.length !== uniqueSectionNames.size) {
-    return next(new Error("Section names must be unique within a menu"));
-  }
+      // Получаем существующие slug'и для данного ресторана
+      const existingSlugs = await (this.constructor as any)
+        .find(
+          {
+            restaurant: this.restaurant,
+            _id: { $ne: this._id },
+          },
+          { slug: 1 }
+        )
+        .then((docs: any[]) => docs.map((doc: any) => doc.slug));
 
-  // Validate that category names are unique within each section
-  for (const section of this.sections) {
-    const categoryNames = section.categories.map((cat) => cat.name.toLowerCase());
-    const uniqueCategoryNames = new Set(categoryNames);
-
-    if (categoryNames.length !== uniqueCategoryNames.size) {
-      return next(new Error(`Category names must be unique within section "${section.name}"`));
+      this.slug = generateUniqueSlug(baseSlug, existingSlugs);
     }
-  }
 
-  next();
+    // Проверяем, что slug был сгенерирован
+    if (!this.slug) {
+      return next(new Error("Failed to generate menu slug"));
+    }
+
+    // Update lastUpdated timestamp
+    this.lastUpdated = new Date();
+
+    // Validate that section names are unique within the menu
+    const sectionNames = this.sections.map((section) =>
+      section.name.toLowerCase()
+    );
+    const uniqueSectionNames = new Set(sectionNames);
+
+    if (sectionNames.length !== uniqueSectionNames.size) {
+      return next(new Error("Section names must be unique within a menu"));
+    }
+
+    // Validate that category names are unique within each section
+    for (const section of this.sections) {
+      const categoryNames = section.categories.map((cat) =>
+        cat.name.toLowerCase()
+      );
+      const uniqueCategoryNames = new Set(categoryNames);
+
+      if (categoryNames.length !== uniqueCategoryNames.size) {
+        return next(
+          new Error(
+            `Category names must be unique within section "${section.name}"`
+          )
+        );
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error instanceof Error ? error : new Error("Unknown error occurred"));
+  }
 });
 
 // Interface for static methods
@@ -722,6 +787,10 @@ export interface IMenuModel extends mongoose.Model<IMenu> {
   findMenuByName(
     restaurantId: mongoose.Types.ObjectId,
     menuName: string
+  ): mongoose.Query<IMenu | null, IMenu>;
+  findMenuBySlug(
+    restaurantId: mongoose.Types.ObjectId,
+    menuSlug: string
   ): mongoose.Query<IMenu | null, IMenu>;
   findActiveMenus(): mongoose.Query<IMenu[], IMenu>;
   findBySection(

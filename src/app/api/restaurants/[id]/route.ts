@@ -77,12 +77,9 @@ export async function PUT(
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Обновляем ресторан
-    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
-      restaurantId,
-      { $set: body },
-      { new: true, runValidators: true }
-    );
+    // Обновляем ресторан (используем save() чтобы сработал middleware для slug)
+    Object.assign(restaurant, body);
+    const updatedRestaurant = await restaurant.save();
 
     return NextResponse.json({
       message: "Restaurant updated successfully",
