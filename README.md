@@ -43,3 +43,4 @@ export PATH=$PATH:/c/Users/radmunn/AppData/Roaming/npm
 
 
 mongod --dbpath "C:\data\db"
+git pull origin main
