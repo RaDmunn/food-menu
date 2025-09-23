@@ -1,0 +1,464 @@
+@use "../_variables.scss" as *;
+@use "sass:color";
+
+.admin-overview {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-family: $Title-font;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: $text-secondary;
+      font-size: 1.1rem;
+    }
+  }
+
+  &__main-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  &__secondary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  &__activity {
+    margin-top: 3rem;
+  }
+
+  &__error {
+    text-align: center;
+    padding: 3rem;
+    background: $bg-secondary;
+    border-radius: 16px;
+
+    h2 {
+      color: $error;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: $text-secondary;
+      margin-bottom: 2rem;
+    }
+  }
+}
+
+// Main Stat Cards
+.stat-card {
+  background: $bg-primary;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid $border-light;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $primary-orange, $accent-yellow);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12);
+
+    &::before {
+      transform: scaleX(1);
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-light;
+  }
+
+  &__title {
+    font-family: $Title-font;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__content {
+    text-align: left;
+  }
+
+  &__main-number {
+    font-family: $Title-font;
+    font-size: 3rem;
+    font-weight: 800;
+    color: $text-primary;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  &__subtitle {
+    color: $text-secondary;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  // Color variants
+  &--users {
+    .stat-card__icon {
+      background: linear-gradient(
+        135deg,
+        $secondary-green,
+        $secondary-green-light
+      );
+    }
+  }
+
+  &--restaurants {
+    .stat-card__icon {
+      background: linear-gradient(
+        135deg,
+        $primary-orange,
+        $primary-orange-light
+      );
+    }
+  }
+
+  &--menus {
+    .stat-card__icon {
+      background: linear-gradient(
+        135deg,
+        $accent-yellow,
+        color.scale($accent-yellow, $lightness: 20%)
+      );
+    }
+  }
+
+  &--pending {
+    .stat-card__icon {
+      background: linear-gradient(
+        135deg,
+        $warning,
+        color.scale($warning, $lightness: 20%)
+      );
+    }
+  }
+}
+
+.stat-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: $text-secondary;
+
+  svg {
+    color: $text-muted;
+    flex-shrink: 0;
+  }
+}
+
+// Secondary Stats
+.secondary-stat {
+  background: $bg-primary;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid $border-light;
+  text-align: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  &__label {
+    color: $text-secondary;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__value {
+    font-family: $Title-font;
+    font-size: 2rem;
+    font-weight: 700;
+    color: $primary-orange;
+  }
+}
+
+// Activity Section
+.activity-section {
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    svg {
+      color: $primary-orange;
+    }
+
+    h3 {
+      font-family: $Title-font;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.activity-card {
+  background: $bg-primary;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid $border-light;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid $border-light;
+
+    svg {
+      color: $text-muted;
+    }
+
+    h4 {
+      font-family: $Title-font;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: color.scale($secondary-cream, $lightness: 80%);
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(
+      135deg,
+      $secondary-green,
+      $secondary-green-light
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: $Title-font;
+    font-weight: 700;
+    font-size: 1rem;
+    color: $text-light;
+    flex-shrink: 0;
+
+    &--pending {
+      background: linear-gradient(
+        135deg,
+        $warning,
+        color.scale($warning, $lightness: 20%)
+      );
+    }
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__subtitle {
+    font-size: 0.85rem;
+    color: $text-muted;
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: $text-muted;
+    flex-shrink: 0;
+
+    svg {
+      opacity: 0.7;
+    }
+  }
+}
+
+.activity-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: $text-muted;
+  font-style: italic;
+}
+
+// Button
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: $primary-orange;
+  color: $text-light;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: $primary-orange-dark;
+    transform: translateY(-2px);
+  }
+}
+
+// Responsive Design
+@media (max-width: $tablet) {
+  .admin-overview {
+    padding: 1rem;
+
+    &__main-stats {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    &__secondary-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .stat-card {
+    padding: 1.5rem;
+
+    &__main-number {
+      font-size: 2.5rem;
+    }
+  }
+
+  .activity-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .activity-item {
+    &__title {
+      white-space: normal;
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .admin-overview {
+    &__main-stats {
+      grid-template-columns: 1fr;
+    }
+
+    &__secondary-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+
+    &__main-number {
+      font-size: 2rem;
+    }
+
+    &__header {
+      gap: 0.75rem;
+    }
+
+    &__icon {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  .activity-item {
+    gap: 0.75rem;
+
+    &__avatar {
+      width: 36px;
+      height: 36px;
+      font-size: 0.9rem;
+    }
+  }
+}

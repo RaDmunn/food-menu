@@ -90,6 +90,11 @@ export default function MenuPage() {
         }
         const restaurantData = await restaurantResponse.json();
 
+        // Проверяем статус ресторана - показываем только активные
+        if (restaurantData.restaurant.status !== "active") {
+          throw new Error("Restaurant not available");
+        }
+
         // Затем получаем меню по slug
         const menuResponse = await fetch(
           `/api/menu/slug/${restaurantData.restaurant._id}/${menuSlug}`
@@ -98,6 +103,12 @@ export default function MenuPage() {
           throw new Error("Menu not found");
         }
         const menuData = await menuResponse.json();
+
+        // Проверяем статус меню - показываем только активные
+        if (!menuData.menu.isActive) {
+          throw new Error("Menu not available");
+        }
+
         setMenu(menuData.menu);
 
         // Устанавливаем первую активную секцию

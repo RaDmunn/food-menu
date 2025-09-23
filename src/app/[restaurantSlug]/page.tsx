@@ -82,6 +82,12 @@ export default function RestaurantPage() {
           throw new Error("Restaurant not found");
         }
         const restaurantData = await restaurantResponse.json();
+
+        // Проверяем статус ресторана - показываем только активные
+        if (restaurantData.restaurant.status !== "active") {
+          throw new Error("Restaurant not available");
+        }
+
         setRestaurant(restaurantData.restaurant);
 
         // Получаем меню ресторана
@@ -221,11 +227,12 @@ export default function RestaurantPage() {
       </section>
 
       {/* Restaurant Details */}
-      <section className="restaurant-details">
-        <div className="container">
-          <div className="restaurant-details__grid">
-            {/* Features */}
-            {restaurant.features && restaurant.features.length > 0 && (
+
+      {restaurant.features && restaurant.features.length > 0 && (
+        <section className="restaurant-details">
+          <div className="container">
+            <div className="restaurant-details__grid">
+              {/* Features */}
               <div className="restaurant-features">
                 <h3>Features</h3>
                 <div className="features-list">
@@ -237,26 +244,10 @@ export default function RestaurantPage() {
                   ))}
                 </div>
               </div>
-            )}
-
-            {/* Price Range */}
-            {restaurant.priceRange && (
-              <div className="restaurant-pricing">
-                <h3>Price Range</h3>
-                <div className="price-range">
-                  <span className="price-min">
-                    {restaurant.priceRange.min} {restaurant.priceRange.currency}
-                  </span>
-                  <span className="price-separator">-</span>
-                  <span className="price-max">
-                    {restaurant.priceRange.max} {restaurant.priceRange.currency}
-                  </span>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Menus Section */}
       {menus.length > 0 && (
