@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../styles/main.css";
+import "../styles/main.scss";
 
 export const metadata: Metadata = {
   title: "FoodMenu - Online Restaurant Menus",
