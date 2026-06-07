@@ -136,11 +136,8 @@ export default function AuthPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store token in localStorage
-        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Redirect based on role
         if (data.user.role === "ADMIN") {
           router.push("/admin");
         } else {
@@ -186,11 +183,8 @@ export default function AuthPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store token in localStorage
-        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Redirect based on role
         if (data.user.role === "ADMIN") {
           router.push("/admin");
         } else {

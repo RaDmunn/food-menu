@@ -236,16 +236,15 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const isNew = menu.isNew;
     const savedMenu = await menu.save();
 
     return NextResponse.json(
       {
-        message: menu.isNew
-          ? "Menu created successfully"
-          : "Menu updated successfully",
+        message: isNew ? "Menu created successfully" : "Menu updated successfully",
         menu: savedMenu,
       },
-      { status: menu.isNew ? 201 : 200 }
+      { status: isNew ? 201 : 200 }
     );
   } catch (error: unknown) {
     console.error("Create/update menu error:", error);

@@ -74,13 +74,7 @@ export default function UserManagement() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/admin/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch("/api/admin/users");
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
@@ -99,13 +93,9 @@ export default function UserManagement() {
     newStatus: User["status"]
   ) => {
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(`/api/admin/users/${userId}/status`, {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
 

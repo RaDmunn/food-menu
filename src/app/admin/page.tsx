@@ -22,11 +22,9 @@ export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in and is admin
-    const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
 
-    if (!token || !userData) {
+    if (!userData) {
       router.push("/auth");
       return;
     }
@@ -41,8 +39,8 @@ export default function AdminPage() {
     setLoading(false);
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     localStorage.removeItem("user");
     router.push("/auth");
   };

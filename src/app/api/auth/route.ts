@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateUser, createUser } from "@/lib/auth";
 import { UserRole } from "@/lib/models/User";
+import { checkRateLimit, resetRateLimit } from "@/lib/rateLimit";
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60, // 7 days
+};
 
 // POST /api/auth - User authentication and registration
 export async function POST(request: NextRequest) {
@@ -17,6 +26,15 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
+      const { allowed, retryAfterMs } = checkRateLimit(`login:${ip}`);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: `Too many login attempts. Try again in ${Math.ceil(retryAfterMs / 60000)} minutes.` },
+          { status: 429 }
+        );
+      }
+
       const result = await authenticateUser(email, password);
       if (!result) {
         return NextResponse.json(
@@ -25,7 +43,9 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return NextResponse.json({
+      resetRateLimit(`login:${ip}`);
+
+      const response = NextResponse.json({
         message: "Login successful",
         user: {
           id: result.user._id,
@@ -34,8 +54,9 @@ export async function POST(request: NextRequest) {
           role: result.user.role,
           status: result.user.status,
         },
-        token: result.token,
       });
+      response.cookies.set("auth_token", result.token, COOKIE_OPTIONS);
+      return response;
     } else if (action === "register") {
       // User registration
       if (!name || !email || !password) {
@@ -64,7 +85,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        return NextResponse.json(
+        const response = NextResponse.json(
           {
             message: "Registration successful",
             user: {
@@ -74,10 +95,11 @@ export async function POST(request: NextRequest) {
               role: result.user.role,
               status: result.user.status,
             },
-            token: result.token,
           },
           { status: 201 }
         );
+        response.cookies.set("auth_token", result.token, COOKIE_OPTIONS);
+        return response;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "";
         if (errorMessage.includes("already exists")) {

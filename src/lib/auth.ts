@@ -53,10 +53,13 @@ export function verifyToken(token: string): JWTPayload | null {
   }
 }
 
-// Get token from request headers
+// Get token from request — prefers HttpOnly cookie, falls back to Authorization header
 export function getTokenFromRequest(request: NextRequest): string | null {
+  const cookieToken = request.cookies.get("auth_token")?.value;
+  if (cookieToken) return cookieToken;
+
   const authHeader = request.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
+  if (authHeader?.startsWith("Bearer ")) {
     return authHeader.substring(7);
   }
   return null;

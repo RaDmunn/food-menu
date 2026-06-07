@@ -69,11 +69,9 @@ export default function UserPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in and is restaurant owner
-    const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
 
-    if (!token || !userData) {
+    if (!userData) {
       router.push("/auth");
       return;
     }
@@ -91,12 +89,7 @@ export default function UserPage() {
 
   const loadRestaurants = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/restaurants?my=true", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch("/api/restaurants?my=true");
 
       if (response.ok) {
         const data = await response.json();
@@ -117,9 +110,6 @@ export default function UserPage() {
 
   const handleCreateRestaurant = async (restaurantData: RestaurantFormData) => {
     try {
-      const token = localStorage.getItem("token");
-
-      // Если редактируем ресторан, используем PUT запрос
       const isEditing = !!editingRestaurant;
       const url = isEditing
         ? `/api/restaurants/${editingRestaurant._id}`
@@ -130,7 +120,6 @@ export default function UserPage() {
         method: method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(restaurantData),
       });
@@ -173,12 +162,7 @@ export default function UserPage() {
 
   const loadMenus = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/menu?my=true", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch("/api/menu?my=true");
 
       if (response.ok) {
         const data = await response.json();
@@ -191,14 +175,8 @@ export default function UserPage() {
 
   const loadMenuCategories = async (restaurantId: string) => {
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
-        `/api/menu/categories?restaurant=${restaurantId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `/api/menu/categories?restaurant=${restaurantId}`
       );
 
       if (response.ok) {
@@ -214,11 +192,6 @@ export default function UserPage() {
     menuData: MenuFormData & { restaurantId: string }
   ) => {
     try {
-      const token = localStorage.getItem("token");
-
-      console.log("Menu data being sent:", menuData);
-
-      // Если редактируем меню, используем PUT запрос
       const isEditing = !!editingMenu;
       const url = isEditing
         ? `/api/menu/${editingMenu._id}`
@@ -229,7 +202,6 @@ export default function UserPage() {
         method: method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(menuData),
       });
@@ -276,8 +248,8 @@ export default function UserPage() {
     loadMenuCategories(restaurant._id);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     localStorage.removeItem("user");
     router.push("/auth");
   };

@@ -85,13 +85,7 @@ export default function RestaurantManagement() {
   const fetchRestaurants = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/admin/restaurants", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch("/api/admin/restaurants");
       if (!response.ok) {
         throw new Error("Failed to fetch restaurants");
       }
@@ -111,15 +105,11 @@ export default function RestaurantManagement() {
     newStatus: Restaurant["status"]
   ) => {
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
         `/api/admin/restaurants/${restaurantId}/status`,
         {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: newStatus }),
         }
       );

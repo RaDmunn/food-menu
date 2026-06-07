@@ -54,13 +54,7 @@ export default function AdminOverview() {
   const fetchOverviewStats = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/admin/overview", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch("/api/admin/overview");
 
       if (!response.ok) {
         throw new Error("Failed to fetch overview stats");

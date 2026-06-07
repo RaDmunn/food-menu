@@ -49,11 +49,9 @@ export default function MenuManagementPage() {
     useState<string>("");
 
   useEffect(() => {
-    // Check authentication
-    const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
 
-    if (!token || !userData) {
+    if (!userData) {
       router.push("/auth");
       return;
     }
@@ -69,12 +67,7 @@ export default function MenuManagementPage() {
 
   const loadMenu = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`/api/menu/${menuId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(`/api/menu/${menuId}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -95,13 +88,9 @@ export default function MenuManagementPage() {
   // Section management functions
   const handleCreateSection = async (data: SectionFormData) => {
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch("/api/menu/sections", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           restaurantId: menu?.restaurant._id,
           menuName: menu?.name,
@@ -133,13 +122,9 @@ export default function MenuManagementPage() {
     if (!editingSection) return;
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch("/api/menu/sections", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           restaurantId: menu?.restaurant._id,
           menuName: menu?.name,
@@ -174,15 +159,9 @@ export default function MenuManagementPage() {
     }
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
         `/api/menu/sections?restaurant=${menu?.restaurant._id}&menu=${menu?.name}&section=${sectionName}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { method: "DELETE" }
       );
 
       if (response.ok) {
@@ -222,15 +201,9 @@ export default function MenuManagementPage() {
     }
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
         `/api/menu/categories?restaurant=${menu?.restaurant._id}&menu=${menu?.name}&section=${sectionName}&category=${categoryName}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { method: "DELETE" }
       );
 
       if (response.ok) {
@@ -247,13 +220,9 @@ export default function MenuManagementPage() {
 
   const handleCreateCategory = async (data: CategoryFormData) => {
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch("/api/menu/categories", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           restaurantId: menu?.restaurant._id,
           menuName: menu?.name,
@@ -282,13 +251,9 @@ export default function MenuManagementPage() {
     if (!editingCategory) return;
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch("/api/menu/categories", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           restaurantId: menu?.restaurant._id,
           menuName: menu?.name,
@@ -344,15 +309,9 @@ export default function MenuManagementPage() {
     }
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
         `/api/menu/items?restaurant=${menu?.restaurant._id}&menu=${menu?.name}&section=${sectionName}&category=${categoryName}&item=${itemName}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { method: "DELETE" }
       );
 
       if (response.ok) {
@@ -369,13 +328,9 @@ export default function MenuManagementPage() {
 
   const handleCreateItem = async (data: ItemFormData) => {
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch("/api/menu/items", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           restaurantId: menu?.restaurant._id,
           menuName: menu?.name,
@@ -404,13 +359,9 @@ export default function MenuManagementPage() {
     if (!editingItem) return;
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch("/api/menu/items", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           restaurantId: menu?.restaurant._id,
           menuName: menu?.name,

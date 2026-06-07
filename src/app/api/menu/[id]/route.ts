@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
+import { UserRole } from "@/lib/models/User";
 import dbConnect from "@/lib/dbConnect";
 import Menu from "@/lib/models/Menu";
 import Restaurant from "@/lib/models/Restaurant";
@@ -32,10 +33,11 @@ export async function GET(
       return NextResponse.json({ error: "Menu not found" }, { status: 404 });
     }
 
-    // Проверяем, что пользователь является владельцем ресторана
-    if (
-      (menu.restaurant as any).owner.toString() !== (user as any)._id.toString()
-    ) {
+    const isAdmin = user.role === UserRole.ADMIN;
+    const isOwner =
+      (menu.restaurant as any).owner.toString() ===
+      (user._id as any).toString();
+    if (!isAdmin && !isOwner) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
@@ -74,15 +76,22 @@ export async function PUT(
       return NextResponse.json({ error: "Menu not found" }, { status: 404 });
     }
 
-    // Проверяем, что пользователь является владельцем ресторана
-    if (
-      (menu.restaurant as any).owner.toString() !== (user as any)._id.toString()
-    ) {
+    const isAdminPut = user.role === UserRole.ADMIN;
+    const isOwnerPut =
+      (menu.restaurant as any).owner.toString() ===
+      (user._id as any).toString();
+    if (!isAdminPut && !isOwnerPut) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Обновляем меню (используем save() чтобы сработал middleware для slug)
-    Object.assign(menu, body);
+    // Only allow safe fields — prevents client from overwriting restaurant ref or other system fields
+    const { name, description, currency, isActive, sections } = body;
+    if (name !== undefined) menu.name = name;
+    if (description !== undefined) menu.description = description;
+    if (currency !== undefined) menu.currency = currency;
+    if (isActive !== undefined) menu.isActive = isActive;
+    if (sections !== undefined) menu.sections = sections;
+
     const updatedMenu = await menu.save();
 
     // Populate restaurant после сохранения
@@ -125,10 +134,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Menu not found" }, { status: 404 });
     }
 
-    // Проверяем, что пользователь является владельцем ресторана
-    if (
-      (menu.restaurant as any).owner.toString() !== (user as any)._id.toString()
-    ) {
+    const isAdminDel = user.role === UserRole.ADMIN;
+    const isOwnerDel =
+      (menu.restaurant as any).owner.toString() ===
+      (user._id as any).toString();
+    if (!isAdminDel && !isOwnerDel) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
