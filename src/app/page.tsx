@@ -11,8 +11,8 @@ export default function HomePage() {
       <Header />
       <Hero />
       <WhyChooseUs
-      leftImg="/img/kchau.png"
-      rightImg="/img/shrek.png"
+      leftImg="/img/menu-simple.png"
+      rightImg="/img/menu-online.png"
       />
       <FeaturesSection />
     </>
