@@ -28,7 +28,7 @@ function FlagRO() {
 
 const languages: Lang[] = [
   { code: "en", label: "English", flag: <FlagEN /> },
-  { code: "ro", label: "Română", flag: <FlagRO /> },
+  { code: "ro", label: "Romana", flag: <FlagRO /> },
 ];
 
 export default function Header() {
@@ -38,11 +38,12 @@ export default function Header() {
   const ddRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (ddRef.current && !ddRef.current.contains(e.target as Node)) {
+    const onClick = (event: MouseEvent) => {
+      if (ddRef.current && !ddRef.current.contains(event.target as Node)) {
         setLangOpen(false);
       }
     };
+
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, []);
@@ -60,6 +61,7 @@ export default function Header() {
         <a className="header__brand" href="/">
           DOMAIN
         </a>
+
         <nav className="header__nav">
           <a href="/" className="header__link">
             Home
@@ -67,58 +69,54 @@ export default function Header() {
           <a href="/features" className="header__link">
             Features
           </a>
-          <a href="/pricing" className="header__link">
-            Pricing
-          </a>
           <a href="/contact" className="header__link">
             Contact
           </a>
         </nav>
+
         <div className="header__actions">
-          <a href="/docs" className="header__button header__button--ghost">
-            Docs
-          </a>
-          <a href="/faq" className="header__button header__button--ghost">
-            FAQ
-          </a>
-          <a href="/demo" className="header__button header__button--cta">
-            Request demo
-          </a>
+          {/*
           <div className="lang" ref={ddRef}>
             <button
               className="lang__trigger"
-              onClick={() => setLangOpen((v) => !v)}
+              onClick={() => setLangOpen((value) => !value)}
+              type="button"
             >
               {current.flag}
               <span className="lang__code">{current.code.toUpperCase()}</span>
               <span className={`lang__chev ${langOpen ? "is-open" : ""}`}>
-                ▾
+                v
               </span>
             </button>
+
             <div className={`lang__menu ${langOpen ? "is-open" : ""}`}>
-              {languages.map((l) => (
+              {languages.map((language) => (
                 <button
-                  key={l.code}
+                  key={language.code}
                   className={`lang__item ${
-                    l.code === current.code ? "is-active" : ""
+                    language.code === current.code ? "is-active" : ""
                   }`}
                   onClick={() => {
-                    setCurrent(l);
+                    setCurrent(language);
                     setLangOpen(false);
                   }}
+                  type="button"
                 >
-                  {l.flag}
-                  <span className="lang__label">{l.label}</span>
-                  <span className="lang__tag">{l.code.toUpperCase()}</span>
+                  {language.flag}
+                  <span className="lang__label">{language.label}</span>
+                  <span className="lang__tag">{language.code.toUpperCase()}</span>
                 </button>
               ))}
             </div>
           </div>
+          */}
+
           <button
             className="header__burger"
             aria-label="Menu"
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((v) => !v)}
+            onClick={() => setMenuOpen((value) => !value)}
+            type="button"
           >
             <span />
             <span />
@@ -135,16 +133,18 @@ export default function Header() {
               href="/"
               onClick={() => setMenuOpen(false)}
             >
-              habernier.com
+              DOMAIN
             </a>
             <button
               className="header-mobile__close"
               aria-label="Close"
               onClick={() => setMenuOpen(false)}
+              type="button"
             >
-              ✕
+              x
             </button>
           </div>
+
           <nav className="header-mobile__nav">
             <a href="/" onClick={() => setMenuOpen(false)}>
               Home
@@ -152,59 +152,38 @@ export default function Header() {
             <a href="/features" onClick={() => setMenuOpen(false)}>
               Features
             </a>
-            <a href="/pricing" onClick={() => setMenuOpen(false)}>
-              Pricing
-            </a>
             <a href="/contact" onClick={() => setMenuOpen(false)}>
               Contact
             </a>
           </nav>
-          <div className="header-mobile__actions">
-            <a
-              href="/docs"
-              className="header__button header__button--ghost"
-              onClick={() => setMenuOpen(false)}
-            >
-              Docs
-            </a>
-            <a
-              href="/faq"
-              className="header__button header__button--ghost"
-              onClick={() => setMenuOpen(false)}
-            >
-              FAQ
-            </a>
-            <a
-              href="/demo"
-              className="header__button header__button--cta"
-              onClick={() => setMenuOpen(false)}
-            >
-              Request demo
-            </a>
-          </div>
+
+          {/*
           <div className="header-mobile__langs">
-            {languages.map((l) => (
+            {languages.map((language) => (
               <button
-                key={l.code}
+                key={language.code}
                 className={`header-mobile__lang ${
-                  l.code === current.code ? "is-active" : ""
+                  language.code === current.code ? "is-active" : ""
                 }`}
                 onClick={() => {
-                  setCurrent(l);
+                  setCurrent(language);
                   setMenuOpen(false);
                 }}
+                type="button"
               >
-                {l.flag}
-                <span>{l.label}</span>
-                <em>{l.code.toUpperCase()}</em>
+                {language.flag}
+                <span>{language.label}</span>
+                <em>{language.code.toUpperCase()}</em>
               </button>
             ))}
           </div>
+          */}
         </div>
         <button
           className="header-mobile__backdrop"
           aria-hidden="true"
           onClick={() => setMenuOpen(false)}
+          type="button"
         />
       </div>
     </div>

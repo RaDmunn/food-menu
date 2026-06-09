@@ -8,8 +8,6 @@ type Props = {
   leftImg?: string;
   rightImg?: string;
   kpis?: { num: string; label: string }[];
-  ctaHref?: string;
-  ctaText?: string;
 };
 
 export default function WhyChooseUs({
@@ -22,8 +20,6 @@ export default function WhyChooseUs({
     { num: "+18%", label: "avg. ticket" },
     { num: "10m", label: "to launch" },
   ],
-  ctaHref = "#demo",
-  ctaText = "Open live demo",
 }: Props) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState(56);
@@ -96,9 +92,6 @@ export default function WhyChooseUs({
           ))}
         </ul>
 
-        <div className="whyx-qrmenu__cta">
-          <a href={ctaHref} className="btn btn--primary">{ctaText}</a>
-        </div>
       </div>
     </section>
   );
