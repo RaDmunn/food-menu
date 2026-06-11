@@ -11,6 +11,7 @@ import CreateCategoryForm, {
 } from "@/components/menu/CreateCategoryForm";
 import CreateItemForm, { ItemFormData } from "@/components/menu/CreateItemForm";
 import SectionCard, { Section, Category } from "@/components/menu/SectionCard";
+import QrCode from "@/components/ui/QrCode";
 
 interface Menu {
   _id: string;
@@ -21,7 +22,9 @@ interface Menu {
   restaurant: {
     _id: string;
     name: string;
+    slug: string;
   };
+  slug: string;
   sections: Section[];
   createdAt: string;
   updatedAt: string;
@@ -47,6 +50,12 @@ export default function MenuManagementPage() {
     useState<string>("");
   const [currentCategoryForItem, setCurrentCategoryForItem] =
     useState<string>("");
+  const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -413,6 +422,19 @@ export default function MenuManagementPage() {
     setCurrentCategoryForItem("");
   };
 
+  const publicMenuUrl =
+    origin && menu?.restaurant.slug && menu.slug
+      ? `${origin}/${menu.restaurant.slug}/${menu.slug}`
+      : "";
+
+  const handleCopyPublicLink = async () => {
+    if (!publicMenuUrl) return;
+
+    await navigator.clipboard.writeText(publicMenuUrl);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1500);
+  };
+
   if (loading) {
     return <LoadingSpinner size="large" text="Loading menu..." fullScreen />;
   }
@@ -472,6 +494,34 @@ export default function MenuManagementPage() {
               Currency: {menu.currency}
             </span>
           </div>
+
+          {publicMenuUrl && (
+            <div className="menu-management__public">
+              <div className="menu-management__public-info">
+                <span className="menu-management__public-label">
+                  Public menu link
+                </span>
+                <a
+                  className="menu-management__public-url"
+                  href={publicMenuUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {publicMenuUrl}
+                </a>
+                <button
+                  className="menu-management__copy-btn"
+                  type="button"
+                  onClick={handleCopyPublicLink}
+                >
+                  {copied ? "Copied" : "Copy link"}
+                </button>
+              </div>
+              <div className="menu-management__qr">
+                <QrCode value={publicMenuUrl} size={152} />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Content */}

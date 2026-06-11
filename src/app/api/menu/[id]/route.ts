@@ -26,7 +26,7 @@ export async function GET(
     // Получаем меню
     const menu = await Menu.findById(menuId).populate(
       "restaurant",
-      "name owner"
+      "name owner slug"
     );
 
     if (!menu) {
@@ -95,7 +95,7 @@ export async function PUT(
     const updatedMenu = await menu.save();
 
     // Populate restaurant после сохранения
-    await updatedMenu.populate("restaurant", "name");
+    await updatedMenu.populate("restaurant", "name slug");
 
     return NextResponse.json({
       message: "Menu updated successfully",
