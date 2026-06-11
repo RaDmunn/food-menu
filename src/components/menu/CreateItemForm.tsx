@@ -45,6 +45,7 @@ export interface ItemFormData {
   preparationTime?: number;
   ingredients?: string[];
   images?: string[];
+  status?: string;
 
   // Маркетинговые теги
   isNewItem?: boolean;
@@ -121,6 +122,8 @@ export default function CreateItemForm({
     calories: editingItem?.calories || undefined,
     preparationTime: editingItem?.preparationTime || undefined,
     ingredients: editingItem?.ingredients || [],
+    images: editingItem?.images || [],
+    status: editingItem?.status || 'available',
 
     // Маркетинговые теги
     isNewItem: editingItem?.isNewItem || false,
@@ -138,6 +141,8 @@ export default function CreateItemForm({
   const [tagInput, setTagInput] = useState('');
   const [showSizes, setShowSizes] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   const validateForm = (): boolean => {
     const newErrors: {[key: string]: string} = {};
@@ -222,6 +227,53 @@ export default function CreateItemForm({
     }));
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+
+    setIsUploadingImage(true);
+    setUploadError('');
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+        uploadData.append('restaurantId', restaurantId);
+
+        const response = await fetch('/api/uploads/menu-item-image', {
+          method: 'POST',
+          body: uploadData,
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to upload image');
+        }
+
+        uploadedUrls.push(data.url);
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...uploadedUrls],
+      }));
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Failed to upload image');
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = '';
+    }
+  };
+
+  const removeImage = (imageUrl: string) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images?.filter(url => url !== imageUrl) || [],
+    }));
+  };
+
   return (
     <div className="create-item-form">
       <div className="create-item-form__header">
@@ -273,6 +325,39 @@ export default function CreateItemForm({
               required
             />
             {errors.price && <span className="create-item-form__error">{errors.price}</span>}
+          </div>
+
+          <div className="create-item-form__field">
+            <label className="create-item-form__label">Item Images</label>
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              multiple
+              className="create-item-form__file-input"
+              onChange={handleImageUpload}
+              disabled={isUploadingImage}
+            />
+            <small className="create-item-form__help">
+              JPG, PNG, WEBP or GIF. Max 5MB per image.
+            </small>
+            {isUploadingImage && (
+              <span className="create-item-form__help">Uploading image...</span>
+            )}
+            {uploadError && (
+              <span className="create-item-form__error">{uploadError}</span>
+            )}
+            {(formData.images || []).length > 0 && (
+              <div className="create-item-form__image-list">
+                {(formData.images || []).map((imageUrl) => (
+                  <div key={imageUrl} className="create-item-form__image-preview">
+                    <img src={imageUrl} alt={`${formData.name || 'Menu item'} preview`} />
+                    <button type="button" onClick={() => removeImage(imageUrl)}>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -849,7 +934,7 @@ export default function CreateItemForm({
           <button
             type="submit"
             className="create-item-form__button create-item-form__button--primary"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUploadingImage}
           >
             {isSubmitting ? 'Saving...' : (editingItem ? 'Update Item' : 'Create Item')}
           </button>

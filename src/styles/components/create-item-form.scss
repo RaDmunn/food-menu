@@ -96,6 +96,64 @@
     font-family: $Main-font;
   }
 
+  &__file-input {
+    padding: 14px 16px;
+    border: 2px dashed $border-light;
+    border-radius: 12px;
+    background: rgba($neutral-light-gray, 0.35);
+    font-family: $Main-font;
+    color: $text-secondary;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-orange;
+      box-shadow: 0 0 0 3px rgba($primary-orange, 0.1);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__image-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  &__image-preview {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid $border-light;
+    border-radius: 10px;
+    background: $neutral-white;
+
+    img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      background: #dc3545;
+      color: $neutral-white;
+      padding: 7px 8px;
+      font-family: $Main-font;
+      font-size: 0.8rem;
+      cursor: pointer;
+
+      &:hover {
+        background: #c82333;
+      }
+    }
+  }
+
   &__checkboxes {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
