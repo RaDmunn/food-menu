@@ -80,9 +80,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter active sections, categories and available items for each menu
-    const filteredMenus = menus.map((menu: any) => ({
-      ...menu.toObject(),
-      sections: menu.sections
+    const filteredMenus = menus.map((menu: any) => {
+      const data = menu.toObject();
+      return { ...data,
+      sections: data.sections
         .filter((section: { isActive: boolean }) => section.isActive)
         .map((section: any) => ({
           ...section,
@@ -104,7 +105,7 @@ export async function GET(request: NextRequest) {
           (a: { sortOrder?: number }, b: { sortOrder?: number }) =>
             (a.sortOrder || 0) - (b.sortOrder || 0)
         ),
-    }));
+    }; });
 
     // If requesting a specific menu by name, return single menu
     if (menuName && filteredMenus.length === 1) {

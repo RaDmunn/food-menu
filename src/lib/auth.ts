@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { NextRequest } from "next/server";
 import dbConnect from "./dbConnect";
 import User, { IUser, UserRole, UserStatus } from "./models/User";
+import Restaurant from "./models/Restaurant";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET || "your-secret-key";
 
@@ -195,9 +196,8 @@ export async function canAccessRestaurant(
 
   // Restaurant owner has access only to their restaurants
   if (user.role === UserRole.RESTAURANT_OWNER) {
-    return (
-      user.restaurants?.some((id) => id.toString() === restaurantId) || false
-    );
+    if (!mongoose.Types.ObjectId.isValid(restaurantId)) return false;
+    return !!(await Restaurant.exists({ _id: restaurantId, owner: user._id }));
   }
 
   return false;

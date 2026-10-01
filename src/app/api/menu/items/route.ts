@@ -41,6 +41,15 @@ export async function POST(request: NextRequest) {
       ingredients,
       images,
       nutritionalInfo,
+      status,
+      sizes,
+      defaultSize,
+      servingSize,
+      isPopular,
+      isRecommended,
+      isNewItem,
+      isLimitedTime,
+      tags,
     } = body;
 
     // Validate required fields
@@ -135,9 +144,15 @@ export async function POST(request: NextRequest) {
       preparationTime,
       ingredients: ingredients || [],
       images: images || [],
-      status: MenuItemStatus.AVAILABLE,
-      isPopular: false,
-      isRecommended: false,
+      status: Object.values(MenuItemStatus).includes(status) ? status : MenuItemStatus.AVAILABLE,
+      sizes: sizes || [],
+      defaultSize,
+      servingSize,
+      isPopular: !!isPopular,
+      isRecommended: !!isRecommended,
+      isNewItem: !!isNewItem,
+      isLimitedTime: !!isLimitedTime,
+      tags: tags || [],
       nutritionalInfo,
     };
 
