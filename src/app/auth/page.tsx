@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface LoginForm {
   email: string;
@@ -176,7 +177,7 @@ export default function AuthPage() {
           email: registerForm.email,
           password: registerForm.password,
           phone: registerForm.phone,
-          role: registerForm.role,
+          role: "RESTAURANT_OWNER",
         }),
       });
 
@@ -203,11 +204,14 @@ export default function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-page__container">
+        <aside className="auth-page__editorial"><Link href="/">food<span>menu</span></Link><div><span>THE RESTAURANT WORKSPACE</span><h2>Where every menu finds its place.</h2><p>Considered tools for the people behind memorable places.</p></div><small>FOODMENU / HOSPITALITY PLATFORM</small></aside>
         <div className="auth-page__card">
           <div className="auth-page__header">
-            <h1 className="auth-page__title">FoodMenu</h1>
+            <Link href="/" className="auth-page__home">← Back to website</Link>
+            <span className="auth-page__eyebrow">YOUR WORKSPACE</span>
+            <h1 className="auth-page__title">{isLogin ? "Welcome back." : "Create your account."}</h1>
             <p className="auth-page__subtitle">
-              {isLogin ? "Sign in to manage your menus" : "Create your restaurant workspace"}
+              {isLogin ? "Sign in to manage your restaurants and menus." : "Set up your restaurant workspace."}
             </p>
           </div>
 
@@ -350,22 +354,6 @@ export default function AuthPage() {
                 />
               </div>
 
-              <div className="auth-page__field">
-                <label className="auth-page__label">Role (Development)</label>
-                <CustomSelect
-                  value={registerForm.role}
-                  onChange={(value) =>
-                    setRegisterForm({
-                      ...registerForm,
-                      role: value,
-                    })
-                  }
-                  options={[
-                    { value: "RESTAURANT_OWNER", label: "Restaurant Owner" },
-                    { value: "ADMIN", label: "Admin" },
-                  ]}
-                />
-              </div>
 
               <div className="auth-page__field">
                 <label htmlFor="reg-password" className="auth-page__label">

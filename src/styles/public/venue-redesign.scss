@@ -1,0 +1,54 @@
+@use "../_variables.scss" as *;
+
+.venue-page { background: #f5f2e9; color: $secondary-green; }
+.venue-page__top { background: #f5f2e9; border-bottom: 1px solid #e0e3d7; }
+.venue-page__top > .container, .venue-page__footer > .container { display: flex; justify-content: space-between; align-items: center; min-height: 72px; }
+.venue-page__brand { color: $secondary-green; text-decoration: none; font: 800 24px $Title-font; letter-spacing: -.075em; }
+.venue-page__brand span { font-weight: 400; }
+.venue-page__top .container > span { color: #8b9686; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.venue-page__hero { display: grid; grid-template-columns: 54% 46%; min-height: 670px; }
+.venue-page__hero-image { position: relative; min-height: 670px; overflow: hidden; }
+.venue-page__hero-image img { object-fit: cover; }
+.venue-page__hero-copy { display: flex; flex-direction: column; justify-content: space-between; padding: 56px clamp(40px,6vw,110px) 42px; background: $secondary-green; color: white; }
+.venue-page__back { display: flex; align-items: center; gap: 8px; width: fit-content; margin-bottom: 90px; color: #d9e6d5; text-decoration: none; font-size: 12px; }
+.venue-page__eyebrow { color: $primary-orange-dark; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
+.venue-page__hero .venue-page__eyebrow { color: #ffa678; }
+.venue-page__hero h1 { margin: 24px 0; color: white; font: 400 clamp(63px,5.5vw,90px)/1 Georgia,serif; letter-spacing: -.06em; }
+.venue-page__hero p { max-width: 430px; color: #cfddc9; font-size: 17px; line-height: 1.7; }
+.venue-page__tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 25px 0 38px; }
+.venue-page__tags span { padding: 7px 10px; border: 1px solid #819776; color: #e6efe3; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.venue-page__explore { display: inline-flex; gap: 36px; padding-bottom: 9px; border-bottom: 1px solid #dce8d7; color: white; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+.venue-page__hero-index { align-self: flex-end; color: #a9bea2; font-size: 10px; letter-spacing: .14em; }
+.venue-page__intro { display: grid; grid-template-columns: 1fr .6fr; align-items: end; gap: 50px; padding-top: 116px; padding-bottom: 116px; }
+.venue-page__intro h2, .venue-page__visit h2 { max-width: 600px; margin: 18px 0 0; font: 400 clamp(51px,4.5vw,70px)/1.08 Georgia,serif; letter-spacing: -.06em; }
+.venue-page__intro h2 em, .venue-page__visit h2 em { color: $primary-orange-dark; font-weight: 400; }
+.venue-page__intro > p { max-width: 390px; margin: 0 0 7px; color: #657361; font-size: 16px; line-height: 1.8; }
+.venue-page__menus { padding: 95px 0 115px; background: white; }
+.venue-page__section-heading { display: flex; align-items: flex-end; gap: 22px; margin-bottom: 35px; }
+.venue-page__section-heading h2 { flex: 1; margin: 0; font: 400 clamp(45px,4vw,64px)/1.1 Georgia,serif; letter-spacing: -.055em; }
+.venue-page__section-heading > span:last-child { color: #81907c; font-size: 12px; }
+.venue-page__menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+.venue-page__menu-card { display: grid; grid-template-columns: 46% 54%; min-height: 325px; background: #f5f2e9; color: $secondary-green; text-decoration: none; overflow: hidden; }
+.venue-page__menu-image { position: relative; overflow: hidden; }
+.venue-page__menu-image img { object-fit: cover; transition: transform .7s ease; }
+.venue-page__menu-card:hover img { transform: scale(1.06); }
+.venue-page__menu-copy { display: flex; flex-direction: column; padding: 27px; }
+.venue-page__menu-copy > span { color: $primary-orange-dark; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.venue-page__menu-copy h3 { margin: 30px 0 10px; font: 400 33px/1.1 Georgia,serif; letter-spacing: -.04em; }
+.venue-page__menu-copy p { margin: 0; color: #657361; font-size: 13px; line-height: 1.6; }
+.venue-page__menu-copy strong { display: inline-flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px; border-top: 1px solid #d6dece; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+.venue-page__empty { color: #7c8878; }
+.venue-page__visit { padding: 110px 0; background: #f5f2e9; }
+.venue-page__visit-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 90px; align-items: center; }
+.venue-page__visit-details { display: grid; gap: 16px; }
+.venue-page__visit-details p, .venue-page__visit-details a { display: flex; align-items: center; gap: 17px; margin: 0; padding: 13px 0; border-bottom: 1px solid #d5ddce; color: $secondary-green; text-decoration: none; font-size: 14px; }
+.venue-page__visit-details svg { color: $primary-orange-dark; }
+.venue-page__footer { background: $secondary-green; color: #bfcfba; }
+.venue-page__footer .venue-page__brand { color: white; }
+.venue-page__footer .container > span { font-size: 12px; }
+.venue-page__error { display: grid; place-content: center; min-height: 100vh; text-align: center; background: #f5f2e9; }
+.venue-page__error h1 { font: 400 60px Georgia,serif; }
+.venue-page__error a { color: $secondary-green; }
+@media (max-width: 900px) { .venue-page__hero { grid-template-columns: 1fr; } .venue-page__hero-image { min-height: 460px; } .venue-page__hero-copy { min-height: 450px; } .venue-page__back { margin-bottom: 50px; } .venue-page__menu-grid { grid-template-columns: 1fr; } }
+@media (max-width: 650px) { .venue-page__top .container > span { display: none; } .venue-page__hero-image { min-height: 350px; } .venue-page__hero-copy { padding: 35px 24px; } .venue-page__hero h1 { font-size: 58px; } .venue-page__intro, .venue-page__visit-inner { grid-template-columns: 1fr; gap: 25px; } .venue-page__intro, .venue-page__visit { padding-top: 70px; padding-bottom: 70px; } .venue-page__menus { padding: 70px 0; } .venue-page__menu-card { grid-template-columns: 1fr; } .venue-page__menu-image { min-height: 245px; } .venue-page__menu-copy { min-height: 235px; } }
+@media (prefers-reduced-motion: reduce) { .venue-page__menu-image img { transition: none; } }

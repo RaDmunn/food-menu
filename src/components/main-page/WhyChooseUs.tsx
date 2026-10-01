@@ -2,8 +2,8 @@ import Image from "next/image";
 import { ArrowRight, Layers3, PencilLine, QrCode } from "lucide-react";
 
 const steps = [
-  { icon: Layers3, number: "01", title: "Set up your venue", text: "Add your restaurant details and create menus for different services or locations." },
-  { icon: PencilLine, number: "02", title: "Build your menu", text: "Organize sections and categories, then add dishes, prices, photos and useful labels." },
+  { icon: Layers3, number: "01", title: "Shape your collection", text: "Create a summer, spring or special menu for each restaurant." },
+  { icon: PencilLine, number: "02", title: "Organize every course", text: "Inside each menu, group food and drinks into categories such as pasta, pizza and cocktails." },
   { icon: QrCode, number: "03", title: "Share one link", text: "Put the QR code on a table. Guests see every update as soon as you publish it." },
 ];
 

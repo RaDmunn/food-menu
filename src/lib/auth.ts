@@ -81,7 +81,8 @@ export async function requireAuth(request: NextRequest): Promise<IUser | null> {
   const token = getTokenFromRequest(request);
   if (!token) return null;
 
-  return await getUserFromToken(token);
+  const user = await getUserFromToken(token);
+  return user?.status === UserStatus.ACTIVE ? user : null;
 }
 
 // Middleware for admin role check

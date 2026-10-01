@@ -30,6 +30,10 @@
 @use "./users/owner-redesign.scss";
 @use "./menu/editor-redesign.scss";
 @use "./public/guest-redesign.scss";
+@use "./main_page/premium.scss";
+@use "./public/venue-redesign.scss";
+@use "./users/admin-redesign.scss";
+@use "./users/auth-redesign.scss";
 
 * {
   box-sizing: border-box;

@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           email,
           password,
           phone,
-          role: role || UserRole.RESTAURANT_OWNER,
+          role: UserRole.RESTAURANT_OWNER,
         });
 
         // Authenticate the new user to get token

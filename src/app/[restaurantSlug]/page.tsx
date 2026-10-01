@@ -1,289 +1,43 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Clock,
-  Star,
-  Utensils,
-  Wifi,
-  Car,
-  Truck,
-} from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, ArrowUpRight, Clock3, MapPin, Phone } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-interface Restaurant {
-  _id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  address: {
-    street: string;
-    city: string;
-    state?: string;
-    country: string;
-  };
-  contact: {
-    phone?: string;
-    email?: string;
-    website?: string;
-  };
-  cuisineType: string[];
-  workingHours?: Array<{
-    day: string;
-    open: string;
-    close: string;
-    isClosed: boolean;
-  }>;
-  averageRating?: number;
-  totalReviews?: number;
-  priceRange?: {
-    min: number;
-    max: number;
-    currency: string;
-  };
-  features?: string[];
-  images?: string[];
-  status: string;
-}
-
-interface Menu {
-  _id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  currency: string;
-  isActive: boolean;
-}
+type Restaurant = { _id: string; name: string; slug: string; description?: string; address?: { street?: string; city?: string; country?: string }; contact?: { phone?: string; email?: string; website?: string }; cuisineType?: string[]; workingHours?: Array<{ day: string; open: string; close: string; isClosed: boolean }>; images?: string[]; status: string };
+type Menu = { _id: string; name: string; slug: string; description?: string; currency: string; isActive: boolean };
 
 export default function RestaurantPage() {
-  const params = useParams();
-  const router = useRouter();
+  const slug = useParams().restaurantSlug as string;
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const restaurantSlug = params.restaurantSlug as string;
-
+  const [error, setError] = useState("");
   useEffect(() => {
-    const fetchRestaurant = async () => {
+    if (!slug) return;
+    (async () => {
       try {
-        setLoading(true);
+        const response = await fetch(`/api/restaurants/slug/${slug}`);
+        if (!response.ok) throw new Error("This restaurant could not be found.");
+        const data = await response.json();
+        if (data.restaurant.status !== "active") throw new Error("This restaurant is not currently available.");
+        setRestaurant(data.restaurant);
+        const menuResponse = await fetch(`/api/menu?restaurant=${data.restaurant._id}`);
+        if (menuResponse.ok) { const result = await menuResponse.json(); setMenus((result.menus || []).filter((menu: Menu) => menu.isActive)); }
+      } catch (err) { setError(err instanceof Error ? err.message : "Could not load restaurant."); }
+      finally { setLoading(false); }
+    })();
+  }, [slug]);
+  if (loading) return <LoadingSpinner fullScreen text="Loading restaurant..." />;
+  if (error || !restaurant) return <div className="venue-page__error"><h1>Restaurant unavailable</h1><p>{error}</p><Link href="/">Back to FoodMenu</Link></div>;
 
-        // Получаем ресторан по slug
-        const restaurantResponse = await fetch(
-          `/api/restaurants/slug/${restaurantSlug}`
-        );
-        if (!restaurantResponse.ok) {
-          throw new Error("Restaurant not found");
-        }
-        const restaurantData = await restaurantResponse.json();
-
-        // Проверяем статус ресторана - показываем только активные
-        if (restaurantData.restaurant.status !== "active") {
-          throw new Error("Restaurant not available");
-        }
-
-        setRestaurant(restaurantData.restaurant);
-
-        // Получаем меню ресторана
-        const menusResponse = await fetch(
-          `/api/menu?restaurant=${restaurantData.restaurant._id}`
-        );
-        if (menusResponse.ok) {
-          const menusData = await menusResponse.json();
-          setMenus(menusData.menus || []);
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load restaurant"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (restaurantSlug) {
-      fetchRestaurant();
-    }
-  }, [restaurantSlug]);
-
-  const getFeatureIcon = (feature: string) => {
-    switch (feature.toLowerCase()) {
-      case "wifi":
-        return <Wifi size={20} />;
-      case "parking":
-        return <Car size={20} />;
-      case "delivery":
-        return <Truck size={20} />;
-      default:
-        return <Utensils size={20} />;
-    }
-  };
-
-  const formatWorkingHours = (hours: Restaurant["workingHours"]) => {
-    if (!hours || hours.length === 0) return "Hours not specified";
-
-    const today = new Date()
-      .toLocaleDateString("en-US", { weekday: "long" })
-      .toLowerCase();
-    const todayHours = hours.find((h) => h.day.toLowerCase() === today);
-
-    if (todayHours?.isClosed) {
-      return "Closed today";
-    }
-
-    if (todayHours) {
-      return `Today: ${todayHours.open} - ${todayHours.close}`;
-    }
-
-    return "Hours available";
-  };
-
-  if (loading) {
-    return <LoadingSpinner fullScreen text="Loading restaurant..." />;
-  }
-
-  if (error || !restaurant) {
-    return (
-      <div className="restaurant-error">
-        <div className="container">
-          <h1>Restaurant Not Found</h1>
-          <p>{error || "The restaurant you're looking for doesn't exist."}</p>
-          <button onClick={() => router.push("/")} className="btn-primary">
-            Back to Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="restaurant-page">
-      {/* Hero Section */}
-      <section className="restaurant-hero">
-        <div className="restaurant-hero__bg">
-          {restaurant.images && restaurant.images[0] && (
-            <img src={restaurant.images[0]} alt={restaurant.name} />
-          )}
-        </div>
-        <div className="restaurant-hero__content">
-          <div className="container">
-            <div className="restaurant-hero__info">
-              <h1 className="restaurant-hero__title">{restaurant.name}</h1>
-              {restaurant.description && (
-                <p className="restaurant-hero__description">
-                  {restaurant.description}
-                </p>
-              )}
-
-              <div className="restaurant-hero__meta">
-                <div className="restaurant-meta">
-                  <div className="restaurant-meta__item">
-                    <MapPin size={18} />
-                    <span>
-                      {restaurant.address.street}, {restaurant.address.city}
-                    </span>
-                  </div>
-
-                  {restaurant.contact.phone && (
-                    <div className="restaurant-meta__item">
-                      <Phone size={18} />
-                      <span>{restaurant.contact.phone}</span>
-                    </div>
-                  )}
-
-                  <div className="restaurant-meta__item">
-                    <Clock size={18} />
-                    <span>{formatWorkingHours(restaurant.workingHours)}</span>
-                  </div>
-
-                  {restaurant.averageRating !== undefined && restaurant.averageRating > 0 && (
-                    <div className="restaurant-meta__item">
-                      <Star size={18} />
-                      <span>
-                        {restaurant.averageRating.toFixed(1)} (
-                        {restaurant.totalReviews || 0} reviews)
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="restaurant-hero__cuisine">
-                {restaurant.cuisineType.map((cuisine, index) => (
-                  <span key={index} className="cuisine-tag">
-                    {cuisine}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Restaurant Details */}
-
-      {restaurant.features && restaurant.features.length > 0 && (
-        <section className="restaurant-details">
-          <div className="container">
-            <div className="restaurant-details__grid">
-              {/* Features */}
-              <div className="restaurant-features">
-                <h3>Features</h3>
-                <div className="features-list">
-                  {restaurant.features.map((feature, index) => (
-                    <div key={index} className="feature-item">
-                      {getFeatureIcon(feature)}
-                      <span>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Menus Section */}
-      {menus.length > 0 && (
-        <section className="restaurant-menus">
-          <div className="container">
-            <h2 className="section-title">Our Menus</h2>
-            <div className="menus-grid">
-              {menus
-                .filter((menu) => menu.isActive)
-                .map((menu) => (
-                  <Link
-                    key={menu._id}
-                    className="menu-card"
-                    href={`/${restaurantSlug}/${menu.slug}`}
-                  >
-                    <div className="menu-card__content">
-                      <h3 className="menu-card__title">{menu.name}</h3>
-                      {menu.description && (
-                        <p className="menu-card__description">
-                          {menu.description}
-                        </p>
-                      )}
-                      <div className="menu-card__footer">
-                        <span className="menu-card__currency">
-                          Prices in {menu.currency}
-                        </span>
-                        <span className="menu-card__cta">View Menu →</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </div>
-        </section>
-      )}
-    </div>
-  );
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+  const hours = restaurant.workingHours?.find((item) => item.day.toLowerCase() === today);
+  const address = [restaurant.address?.street, restaurant.address?.city].filter(Boolean).join(", ");
+  const hero = restaurant.images?.[0] || "/img/editorial/bistro-table.webp";
+  const menuImages = ["/img/editorial/vegetables.webp", "/img/editorial/tart.webp", "/img/editorial/wine-board.webp", "/img/editorial/pizza.webp"];
+  return <main className="venue-page"><header className="venue-page__top"><div className="container"><Link href="/" className="venue-page__brand">food<span>menu</span></Link><span>THE RESTAURANT COLLECTION</span></div></header><section className="venue-page__hero"><div className="venue-page__hero-image"><Image src={hero} alt={`${restaurant.name} restaurant`} fill priority sizes="(max-width: 900px) 100vw, 55vw" /></div><div className="venue-page__hero-copy"><div><Link href="/" className="venue-page__back"><ArrowLeft size={16} /> Back to FoodMenu</Link><span className="venue-page__eyebrow">A PLACE TO DISCOVER</span><h1>{restaurant.name}</h1><p>{restaurant.description || "Explore our menus, made with care for every visit."}</p><div className="venue-page__tags">{restaurant.cuisineType?.map((item) => <span key={item}>{item}</span>)}</div><a className="venue-page__explore" href="#menus">Explore the menus <span aria-hidden="true">↓</span></a></div><span className="venue-page__hero-index">FOODMENU / RESTAURANT</span></div></section><section className="venue-page__intro container"><div><span className="venue-page__eyebrow">WELCOME IN</span><h2>A menu for <em>every moment.</em></h2></div><p>Choose a collection below to discover the dishes and drinks that are on the table today.</p></section><section className="venue-page__menus" id="menus"><div className="container"><div className="venue-page__section-heading"><span className="venue-page__eyebrow">THE COLLECTION</span><h2>Explore our menus</h2><span>{String(menus.length).padStart(2, "0")} menus</span></div>{menus.length ? <div className="venue-page__menu-grid">{menus.map((menu, index) => <Link href={`/${slug}/${menu.slug}`} className="venue-page__menu-card" key={menu._id}><div className="venue-page__menu-image"><Image src={menuImages[index % menuImages.length]} alt="Restaurant menu photography" fill sizes="(max-width: 750px) 100vw, 45vw" /></div><div className="venue-page__menu-copy"><span>{String(index + 1).padStart(2, "0")} / {menu.currency}</span><h3>{menu.name}</h3><p>{menu.description || "A selection to enjoy at your own pace."}</p><strong>View menu <ArrowUpRight size={18} /></strong></div></Link>)}</div> : <p className="venue-page__empty">Menus will be available here soon.</p>}</div></section><section className="venue-page__visit"><div className="container venue-page__visit-inner"><div><span className="venue-page__eyebrow">FIND US</span><h2>We look forward <em>to seeing you.</em></h2></div><div className="venue-page__visit-details">{address && <p><MapPin size={20} /> {address}</p>}{hours && <p><Clock3 size={20} /> {hours.isClosed ? "Closed today" : `Today ${hours.open}–${hours.close}`}</p>}{restaurant.contact?.phone && <a href={`tel:${restaurant.contact.phone}`}><Phone size={20} /> {restaurant.contact.phone}</a>}</div></div></section><footer className="venue-page__footer"><div className="container"><Link href="/" className="venue-page__brand">food<span>menu</span></Link><span>© {new Date().getFullYear()} {restaurant.name}</span></div></footer></main>;
 }
