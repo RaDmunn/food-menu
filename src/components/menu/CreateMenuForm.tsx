@@ -219,7 +219,7 @@ export default function CreateMenuForm({
                 setErrors((prev) => ({ ...prev, name: "" }));
               }
             }}
-            placeholder="e.g., Main Menu, Lunch Menu, Dinner Menu"
+            placeholder="e.g., Summer Menu, Spring Menu, Chef's Specials"
             required
           />
           {errors.name && (

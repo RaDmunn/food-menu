@@ -104,7 +104,7 @@ export default function CreateSectionForm({
             className={`create-section-form__input ${errors.name ? 'create-section-form__input--error' : ''}`}
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="e.g., Kitchen, Bar, Desserts, Lunch"
+            placeholder="e.g., Food, Drinks"
             required
           />
           {errors.name && <span className="create-section-form__error">{errors.name}</span>}

@@ -90,7 +90,7 @@ export default function CreateCategoryForm({
             className={`create-category-form__input ${errors.name ? 'create-category-form__input--error' : ''}`}
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="e.g., Appetizers, Main Courses, Cocktails, Desserts"
+            placeholder="e.g., Pasta, Pizza, Cocktails, Desserts"
             required
           />
           {errors.name && <span className="create-category-form__error">{errors.name}</span>}
