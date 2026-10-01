@@ -205,9 +205,9 @@ export default function AuthPage() {
       <div className="auth-page__container">
         <div className="auth-page__card">
           <div className="auth-page__header">
-            <h1 className="auth-page__title">DOMAIN</h1>
+            <h1 className="auth-page__title">FoodMenu</h1>
             <p className="auth-page__subtitle">
-              {isLogin ? "Welcome back" : "Join our culinary community"}
+              {isLogin ? "Sign in to manage your menus" : "Create your restaurant workspace"}
             </p>
           </div>
 

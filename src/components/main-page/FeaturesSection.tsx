@@ -1,78 +1,17 @@
-import { Menu, MapPin, Star, Store } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowUpRight, Globe2, Image as ImageIcon, ScanLine, SlidersHorizontal } from "lucide-react";
 
 const features = [
-  {
-    id: 1,
-    title: "Restaurant Directory",
-    description:
-      "Structured restaurant profiles with cuisine, atmosphere, contacts, and location details.",
-    icon: Store,
-    side: "left",
-  },
-  {
-    id: 2,
-    title: "Live Menus",
-    description:
-      "Publish menu changes instantly across dishes, descriptions, availability, and labels.",
-    icon: Menu,
-    side: "right",
-  },
-  {
-    id: 3,
-    title: "Guest Signals",
-    description:
-      "Collect useful feedback and highlight the dishes guests care about most.",
-    icon: Star,
-    side: "left",
-  },
-  {
-    id: 4,
-    title: "Real-time Info",
-    description:
-      "Keep hours, promotions, and restaurant details current without reprinting anything.",
-    icon: MapPin,
-    side: "right",
-  },
+  { icon: SlidersHorizontal, title: "One place to manage", text: "Keep each restaurant, menu, section and dish organized without a crowded workspace." },
+  { icon: ImageIcon, title: "Details guests need", text: "Show clear descriptions, pricing, photos, ingredients and dietary information." },
+  { icon: ScanLine, title: "Made for the table", text: "Every public menu has a shareable link and a QR code ready for print." },
+  { icon: Globe2, title: "Flexible for growth", text: "Run several restaurants and several menus with one owner account." },
 ];
 
 export default function FeaturesSection() {
-  return (
-    <section className="features-section">
-      <div className="features-section__inner">
-        <div className="features-section__header">
-          <span className="features-section__eyebrow">Platform features</span>
-          <h2>Everything a modern menu needs</h2>
-          <p>
-            Keep operations simple with menu publishing, guest-facing details,
-            and restaurant information in one focused interface.
-          </p>
-        </div>
-
-        <div className="features-section__grid">
-          {features.map((feature, index) => {
-            const IconComponent = feature.icon;
-
-            return (
-              <div
-                key={feature.id}
-                className={`feature-card feature-card--${feature.side}`}
-                style={{ animationDelay: `${index * 0.08}s` }}
-              >
-                <div className="feature-card__icon">
-                  <IconComponent size={30} strokeWidth={1.8} />
-                </div>
-                <div className="feature-card__content">
-                  <h3 className="feature-card__title">{feature.title}</h3>
-                  <p className="feature-card__description">
-                    {feature.description}
-                  </p>
-                </div>
-                <div className="feature-card__number">{feature.id}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
+  return <>
+    <section className="site-features" id="features"><div className="container"><div className="site-section-heading site-section-heading--split"><div><span className="site-eyebrow">Thoughtfully practical</span><h2>All the essentials.<br />None of the clutter.</h2></div><p>Make edits in the dashboard, then let guests explore a polished menu on their own phone.</p></div><div className="site-features__grid">{features.map(({ icon: Icon, title, text }) => <article className="site-feature" key={title}><Icon size={27} strokeWidth={1.6} /><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>
+    <section className="site-showcase"><div className="container site-showcase__grid"><div className="site-showcase__image"><Image src="/img/editorial/tart.webp" alt="Lemon tart and espresso in a café" fill sizes="(max-width: 900px) 100vw, 47vw" /></div><div className="site-showcase__copy"><span className="site-eyebrow">For the guest experience</span><h2>Let the food speak for itself.</h2><p>Readable menus, beautiful dish photography and helpful details make choosing feel effortless. Every change you make is reflected in the guest view.</p><Link href="/auth" className="site-button site-button--light">Start building your menu <ArrowUpRight size={18} /></Link></div></div></section>
+  </>;
 }

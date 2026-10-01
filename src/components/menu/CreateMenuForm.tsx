@@ -37,6 +37,7 @@ interface Menu {
 
 const CURRENCY_OPTIONS = [
   { value: "EUR", label: "EUR (€) - Euro" },
+  { value: "RON", label: "RON (lei) - Romanian Leu" },
   { value: "USD", label: "USD ($) - US Dollar" },
   { value: "GBP", label: "GBP (£) - British Pound" },
   { value: "CHF", label: "CHF - Swiss Franc" },
@@ -150,6 +151,7 @@ export default function CreateMenuForm({
                   ? "create-menu-form__custom-select-trigger--error"
                   : ""
               }`}
+              disabled={!!editingMenu}
               onClick={() => setIsRestaurantSelectOpen(!isRestaurantSelectOpen)}
             >
               <span>
@@ -200,6 +202,7 @@ export default function CreateMenuForm({
           {errors.restaurant && (
             <span className="create-menu-form__error">{errors.restaurant}</span>
           )}
+          {editingMenu && <small>Restaurant cannot be changed for an existing menu.</small>}
         </div>
 
         <div className="create-menu-form__field">

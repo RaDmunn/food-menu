@@ -283,7 +283,7 @@ export default function RestaurantForm({
       city: initialData?.address?.city || "",
       state: initialData?.address?.state || "",
       zipCode: initialData?.address?.zipCode || "",
-      country: initialData?.address?.country || "Germany",
+      country: initialData?.address?.country || "",
     },
     contact: {
       phone: initialData?.contact?.phone || "",
@@ -571,6 +571,8 @@ export default function RestaurantForm({
         </div>
       </div>
 
+      <details className="restaurant-form__optional" open={isEditing}>
+        <summary>More details <span>Contact, opening hours and amenities</span></summary>
       {/* Contact Information */}
       <div className="restaurant-form__section">
         <h3 className="restaurant-form__section-title">Contact Information</h3>
@@ -840,6 +842,7 @@ export default function RestaurantForm({
           ))}
         </div>
       </div>
+      </details>
 
       <div className="restaurant-form__actions">
         <button

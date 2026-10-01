@@ -1,50 +1,27 @@
-type HeroProps = {
-  domain?: string;
-  line1?: string;
-  line2?: string;
-  subtitle?: string;
-};
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowUpRight, Check, QrCode } from "lucide-react";
 
-export default function Hero({
-  domain = "DOMAIN",
-  line1 = "DOMAIN",
-  line2 = "Digital menus built for faster service",
-  subtitle = "A clean QR menu platform for restaurants that need instant updates, multilingual content, and a smoother guest experience.",
-}: HeroProps) {
+export default function Hero() {
   return (
-    <section className="hero-qrmenu" aria-labelledby="hero-title" data-section="hero">
-      <div className="hero-qrmenu__inner container">
-        <div className="hero-qrmenu__grid">
-          <div className="hero-qrmenu__content">
-            <div className="hero-qrmenu__eyebrow" data-i18n="hero.eyebrow">
-              QR menu for cafes & restaurants
-            </div>
-            <h1 id="hero-title" className="hero-qrmenu__title" aria-live="polite">
-              <span className="hero-qrmenu__title-main" data-i18n="hero.titleMain">
-                {line1 || domain}
-              </span>
-              <span className="hero-qrmenu__title-accent" data-i18n="hero.titleAccent">
-                {line2}
-              </span>
-            </h1>
-            <p className="hero-qrmenu__subtitle" data-i18n="hero.subtitle">
-              {subtitle}
-            </p>
-            <ul className="hero-qrmenu__badges" aria-label="Highlights">
-              <li className="badge" data-i18n="hero.badge1">
-                No app needed
-              </li>
-              <li className="badge" data-i18n="hero.badge2">
-                Multi-language
-              </li>
-              <li className="badge" data-i18n="hero.badge3">
-                Table analytics
-              </li>
-            </ul>
+    <section className="site-hero">
+      <div className="site-hero__inner container">
+        <div className="site-hero__copy">
+          <span className="site-eyebrow"><span /> Digital menus for hospitality</span>
+          <h1>A better menu experience, from first scan to last course.</h1>
+          <p>Create clear, beautiful digital menus for every venue. Update dishes in one place and give guests a menu that is always current.</p>
+          <div className="site-hero__actions">
+            <Link className="site-button site-button--dark" href="/auth">Create your menu <ArrowUpRight size={19} /></Link>
+            <Link className="site-button site-button--text" href="#how-it-works">See how it works <span aria-hidden="true">→</span></Link>
           </div>
-
+          <div className="site-hero__proof"><Check size={17} /> No app for guests <span /> <Check size={17} /> Updates appear instantly</div>
+        </div>
+        <div className="site-hero__visual">
+          <Image src="/img/editorial/bistro-table.webp" alt="Seasonal pasta served in a contemporary restaurant" fill priority sizes="(max-width: 900px) 100vw, 52vw" />
+          <div className="site-hero__float"><QrCode size={24} strokeWidth={1.6} /><div><strong>One scan. Your menu.</strong><span>Ready at every table</span></div></div>
         </div>
       </div>
+      <div className="site-hero__bottom container"><span>BUILT FOR REAL RESTAURANT WORKFLOWS</span><span>Restaurant → Menus → Sections → Dishes</span></div>
     </section>
   );
 }

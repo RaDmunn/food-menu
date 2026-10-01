@@ -186,7 +186,8 @@ export default function MenuPage() {
   };
 
   const formatPrice = (price: number, currency: string) => {
-    return `${price} ${currency}`;
+    try { return new Intl.NumberFormat("en", { style: "currency", currency }).format(price); }
+    catch { return `${price.toFixed(2)} ${currency}`; }
   };
 
   if (loading) {
@@ -299,8 +300,8 @@ export default function MenuPage() {
                     <div className="menu-items">
                       {category.items
                         .filter((item) => item.status === "available")
-                        .map((item, index) => (
-                          <div key={index} className="menu-item">
+                        .map((item) => (
+                          <div key={item.name} className="menu-item">
                             <div className="menu-item__content">
                               <div className="menu-item__header">
                                 <h4 className="menu-item__name">

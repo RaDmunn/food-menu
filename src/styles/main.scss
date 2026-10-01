@@ -26,6 +26,10 @@
 @use "./menu/menu-management.scss";
 @use "./public/restaurant-page.scss";
 @use "./public/menu-page.scss";
+@use "./main_page/redesign.scss";
+@use "./users/owner-redesign.scss";
+@use "./menu/editor-redesign.scss";
+@use "./public/guest-redesign.scss";
 
 * {
   box-sizing: border-box;

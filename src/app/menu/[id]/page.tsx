@@ -1,638 +1,121 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Copy, ImageIcon, Pencil, Plus, QrCode as QrIcon, Trash2 } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import CreateSectionForm, {
-  SectionFormData,
-} from "@/components/menu/CreateSectionForm";
-import CreateCategoryForm, {
-  CategoryFormData,
-} from "@/components/menu/CreateCategoryForm";
-import CreateItemForm, { ItemFormData } from "@/components/menu/CreateItemForm";
-import SectionCard, { Section, Category } from "@/components/menu/SectionCard";
+import Modal from "@/components/ui/Modal";
 import QrCode from "@/components/ui/QrCode";
+import CreateSectionForm, { type SectionFormData } from "@/components/menu/CreateSectionForm";
+import CreateCategoryForm, { type CategoryFormData } from "@/components/menu/CreateCategoryForm";
+import CreateItemForm, { type ItemFormData } from "@/components/menu/CreateItemForm";
 
-interface Menu {
-  _id: string;
-  name: string;
-  description: string;
-  currency: string;
-  isActive: boolean;
-  restaurant: {
-    _id: string;
-    name: string;
-    slug: string;
-  };
-  slug: string;
-  sections: Section[];
-  createdAt: string;
-  updatedAt: string;
-}
+interface Dish extends ItemFormData { status: string; }
+interface Category { name: string; description?: string; sortOrder?: number; items: Dish[]; }
+interface Section { name: string; description?: string; sortOrder?: number; categories: Category[]; }
+interface MenuData { _id: string; name: string; slug: string; description?: string; currency: string; isActive: boolean; restaurant: { _id: string; name: string; slug: string }; sections: Section[]; }
+type Dialog = "section" | "category" | "dish" | null;
 
 export default function MenuManagementPage() {
   const router = useRouter();
-  const params = useParams();
-  const menuId = params.id as string;
-
-  const [menu, setMenu] = useState<Menu | null>(null);
+  const menuId = useParams().id as string;
+  const [menu, setMenu] = useState<MenuData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showCreateSectionForm, setShowCreateSectionForm] = useState(false);
+  const [error, setError] = useState("");
+  const [dialog, setDialog] = useState<Dialog>(null);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
-  const [showCreateCategoryForm, setShowCreateCategoryForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [currentSectionForCategory, setCurrentSectionForCategory] =
-    useState<string>("");
-  const [showCreateItemForm, setShowCreateItemForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [currentSectionForItem, setCurrentSectionForItem] =
-    useState<string>("");
-  const [currentCategoryForItem, setCurrentCategoryForItem] =
-    useState<string>("");
+  const [editingDish, setEditingDish] = useState<Dish | null>(null);
+  const [sectionName, setSectionName] = useState("");
+  const [categoryName, setCategoryName] = useState("");
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setOrigin(window.location.origin);
-  }, []);
-
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-
-    if (!userData) {
-      router.push("/auth");
-      return;
-    }
-
-    const parsedUser = JSON.parse(userData);
-    if (parsedUser.role !== "RESTAURANT_OWNER") {
-      router.push("/auth");
-      return;
-    }
-
-    loadMenu();
+    const raw = localStorage.getItem("user");
+    if (!raw) { router.replace("/auth"); return; }
+    try { if (JSON.parse(raw).role !== "RESTAURANT_OWNER") { router.replace("/auth"); return; } }
+    catch { router.replace("/auth"); return; }
+    fetch(`/api/menu/${menuId}`).then(async (response) => {
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not load menu.");
+      setMenu(result.menu);
+    }).catch((err) => setError(err.message)).finally(() => setLoading(false));
   }, [menuId, router]);
 
-  const loadMenu = async () => {
-    try {
-      const response = await fetch(`/api/menu/${menuId}`);
-
-      if (response.ok) {
-        const data = await response.json();
-        setMenu(data.menu);
-      } else if (response.status === 404) {
-        setError("Menu not found");
-      } else {
-        setError("Failed to load menu");
-      }
-    } catch (error) {
-      console.error("Error loading menu:", error);
-      setError("Failed to load menu");
-    } finally {
-      setLoading(false);
-    }
+  const refresh = async () => {
+    const response = await fetch(`/api/menu/${menuId}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Could not refresh menu.");
+    setMenu(result.menu);
   };
-
-  // Section management functions
-  const handleCreateSection = async (data: SectionFormData) => {
-    try {
-      const response = await fetch("/api/menu/sections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurantId: menu?.restaurant._id,
-          menuName: menu?.name,
-          sectionName: data.name,
-          description: data.description,
-          sortOrder: data.sortOrder,
-        }),
-      });
-
-      if (response.ok) {
-        await loadMenu(); // Reload menu to get updated sections
-        setShowCreateSectionForm(false);
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to create section: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error creating section:", error);
-      alert("Failed to create section. Please try again.");
-    }
+  const request = async (path: string, method: string, body?: object) => {
+    setError("");
+    const response = await fetch(path, { method, headers: body ? { "Content-Type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined });
+    const result = await response.json();
+    if (!response.ok) { setError(result.error || "Could not save changes."); throw new Error(result.error || "Could not save changes."); }
+    await refresh();
+    return result;
   };
+  const context = { restaurantId: menu?.restaurant._id || "", menuName: menu?.name || "" };
+  const close = () => { setDialog(null); setEditingSection(null); setEditingCategory(null); setEditingDish(null); setError(""); };
 
-  const handleEditSection = (section: Section) => {
-    setEditingSection(section);
-    setShowCreateSectionForm(true);
+  const saveSection = async (data: SectionFormData) => {
+    await request("/api/menu/sections", editingSection ? "PUT" : "POST", editingSection
+      ? { ...context, sectionName: editingSection.name, newSectionName: data.name, description: data.description, sortOrder: data.sortOrder }
+      : { ...context, sectionName: data.name, description: data.description, sortOrder: data.sortOrder });
+    setSectionName(data.name); setCategoryName(""); close();
   };
-
-  const handleUpdateSection = async (data: SectionFormData) => {
-    if (!editingSection) return;
-
-    try {
-      const response = await fetch("/api/menu/sections", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurantId: menu?.restaurant._id,
-          menuName: menu?.name,
-          sectionName: editingSection.name,
-          newSectionName: data.name,
-          description: data.description,
-          sortOrder: data.sortOrder,
-        }),
-      });
-
-      if (response.ok) {
-        await loadMenu();
-        setShowCreateSectionForm(false);
-        setEditingSection(null);
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to update section: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error updating section:", error);
-      alert("Failed to update section. Please try again.");
-    }
+  const saveCategory = async (data: CategoryFormData) => {
+    await request("/api/menu/categories", editingCategory ? "PUT" : "POST", editingCategory
+      ? { ...context, sectionName: activeSection.name, categoryName: editingCategory.name, newCategoryName: data.name, description: data.description, sortOrder: data.sortOrder }
+      : { ...context, sectionName: activeSection.name, categoryName: data.name, description: data.description, sortOrder: data.sortOrder });
+    setCategoryName(data.name); close();
   };
-
-  const handleDeleteSection = async (sectionName: string) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete the section "${sectionName}"? This will also delete all categories and items within it.`
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `/api/menu/sections?restaurant=${menu?.restaurant._id}&menu=${menu?.name}&section=${sectionName}`,
-        { method: "DELETE" }
-      );
-
-      if (response.ok) {
-        await loadMenu();
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to delete section: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error deleting section:", error);
-      alert("Failed to delete section. Please try again.");
-    }
+  const saveDish = async (data: ItemFormData) => {
+    await request("/api/menu/items", editingDish ? "PUT" : "POST", editingDish
+      ? { ...context, sectionName: activeSection.name, categoryName: activeCategory.name, itemName: editingDish.name, updates: data }
+      : { ...context, sectionName: activeSection.name, categoryName: activeCategory.name, ...data });
+    close();
   };
-
-  const handleAddCategory = (sectionName: string) => {
-    setCurrentSectionForCategory(sectionName);
-    setEditingCategory(null);
-    setShowCreateCategoryForm(true);
+  const remove = async (kind: "section" | "category" | "dish", name: string) => {
+    const message = kind === "section" ? `Delete “${name}” and all its categories and dishes?` : kind === "category" ? `Delete “${name}” and all its dishes?` : `Delete “${name}”?`;
+    if (!window.confirm(message)) return;
+    const path = kind === "section" ? "sections" : kind === "category" ? "categories" : "items";
+    const search = new URLSearchParams({ restaurant: context.restaurantId, menu: context.menuName, ...(kind !== "section" ? { section: activeSection.name } : { section: name }), ...(kind === "category" ? { category: name } : {}), ...(kind === "dish" ? { category: activeCategory.name, item: name } : {}) });
+    try { await request(`/api/menu/${path}?${search}`, "DELETE"); if (kind === "section") { setSectionName(""); setCategoryName(""); } if (kind === "category") setCategoryName(""); }
+    catch { /* Error is shown above the workspace. */ }
   };
+  const openSection = (section: Section | null = null) => { setEditingSection(section); setDialog("section"); setError(""); };
+  const openCategory = (category: Category | null = null) => { setEditingCategory(category); setDialog("category"); setError(""); };
+  const openDish = (dish: Dish | null = null) => { setEditingDish(dish); setDialog("dish"); setError(""); };
 
-  const handleEditCategory = (sectionName: string, category: Category) => {
-    setCurrentSectionForCategory(sectionName);
-    setEditingCategory(category);
-    setShowCreateCategoryForm(true);
-  };
+  if (loading) return <LoadingSpinner size="large" text="Loading menu..." fullScreen />;
+  if (!menu) return <div className="menu-editor__failure"><h1>Menu unavailable</h1><p>{error || "Menu not found."}</p><Link href="/user">Back to dashboard</Link></div>;
 
-  const handleDeleteCategory = async (
-    sectionName: string,
-    categoryName: string
-  ) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete the category "${categoryName}"? This will also delete all items within it.`
-      )
-    ) {
-      return;
-    }
+  const sections = [...menu.sections].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  const activeSection = sections.find((section) => section.name === sectionName) || sections[0];
+  const categories = activeSection ? [...activeSection.categories].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) : [];
+  const activeCategory = categories.find((category) => category.name === categoryName) || categories[0];
+  const totalDishes = menu.sections.reduce((sum, section) => sum + section.categories.reduce((count, category) => count + category.items.length, 0), 0);
+  const publicUrl = origin && menu.restaurant.slug && menu.slug ? `${origin}/${menu.restaurant.slug}/${menu.slug}` : "";
 
-    try {
-      const response = await fetch(
-        `/api/menu/categories?restaurant=${menu?.restaurant._id}&menu=${menu?.name}&section=${sectionName}&category=${categoryName}`,
-        { method: "DELETE" }
-      );
-
-      if (response.ok) {
-        await loadMenu();
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to delete category: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error deleting category:", error);
-      alert("Failed to delete category. Please try again.");
-    }
-  };
-
-  const handleCreateCategory = async (data: CategoryFormData) => {
-    try {
-      const response = await fetch("/api/menu/categories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurantId: menu?.restaurant._id,
-          menuName: menu?.name,
-          sectionName: currentSectionForCategory,
-          categoryName: data.name,
-          description: data.description,
-          sortOrder: data.sortOrder,
-        }),
-      });
-
-      if (response.ok) {
-        await loadMenu();
-        setShowCreateCategoryForm(false);
-        setCurrentSectionForCategory("");
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to create category: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error creating category:", error);
-      alert("Failed to create category. Please try again.");
-    }
-  };
-
-  const handleUpdateCategory = async (data: CategoryFormData) => {
-    if (!editingCategory) return;
-
-    try {
-      const response = await fetch("/api/menu/categories", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurantId: menu?.restaurant._id,
-          menuName: menu?.name,
-          sectionName: currentSectionForCategory,
-          categoryName: editingCategory.name,
-          newCategoryName: data.name,
-          description: data.description,
-          sortOrder: data.sortOrder,
-        }),
-      });
-
-      if (response.ok) {
-        await loadMenu();
-        setShowCreateCategoryForm(false);
-        setEditingCategory(null);
-        setCurrentSectionForCategory("");
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to update category: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error updating category:", error);
-      alert("Failed to update category. Please try again.");
-    }
-  };
-
-  // Item management functions
-  const handleAddItem = (sectionName: string, categoryName: string) => {
-    setCurrentSectionForItem(sectionName);
-    setCurrentCategoryForItem(categoryName);
-    setEditingItem(null);
-    setShowCreateItemForm(true);
-  };
-
-  const handleEditItem = (
-    sectionName: string,
-    categoryName: string,
-    item: any
-  ) => {
-    setCurrentSectionForItem(sectionName);
-    setCurrentCategoryForItem(categoryName);
-    setEditingItem(item);
-    setShowCreateItemForm(true);
-  };
-
-  const handleDeleteItem = async (
-    sectionName: string,
-    categoryName: string,
-    itemName: string
-  ) => {
-    if (!confirm(`Are you sure you want to delete the item "${itemName}"?`)) {
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `/api/menu/items?restaurant=${menu?.restaurant._id}&menu=${menu?.name}&section=${sectionName}&category=${categoryName}&item=${itemName}`,
-        { method: "DELETE" }
-      );
-
-      if (response.ok) {
-        await loadMenu();
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to delete item: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      alert("Failed to delete item. Please try again.");
-    }
-  };
-
-  const handleCreateItem = async (data: ItemFormData) => {
-    try {
-      const response = await fetch("/api/menu/items", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurantId: menu?.restaurant._id,
-          menuName: menu?.name,
-          sectionName: currentSectionForItem,
-          categoryName: currentCategoryForItem,
-          ...data,
-        }),
-      });
-
-      if (response.ok) {
-        await loadMenu();
-        setShowCreateItemForm(false);
-        setCurrentSectionForItem("");
-        setCurrentCategoryForItem("");
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to create item: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error creating item:", error);
-      alert("Failed to create item. Please try again.");
-    }
-  };
-
-  const handleUpdateItem = async (data: ItemFormData) => {
-    if (!editingItem) return;
-
-    try {
-      const response = await fetch("/api/menu/items", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurantId: menu?.restaurant._id,
-          menuName: menu?.name,
-          sectionName: currentSectionForItem,
-          categoryName: currentCategoryForItem,
-          itemName: editingItem.name,
-          updates: data,
-        }),
-      });
-
-      if (response.ok) {
-        await loadMenu();
-        setShowCreateItemForm(false);
-        setEditingItem(null);
-        setCurrentSectionForItem("");
-        setCurrentCategoryForItem("");
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to update item: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Error updating item:", error);
-      alert("Failed to update item. Please try again.");
-    }
-  };
-
-  const handleFormCancel = () => {
-    setShowCreateSectionForm(false);
-    setEditingSection(null);
-    setShowCreateCategoryForm(false);
-    setEditingCategory(null);
-    setCurrentSectionForCategory("");
-    setShowCreateItemForm(false);
-    setEditingItem(null);
-    setCurrentSectionForItem("");
-    setCurrentCategoryForItem("");
-  };
-
-  const handleCategoryFormCancel = () => {
-    setShowCreateCategoryForm(false);
-    setEditingCategory(null);
-    setCurrentSectionForCategory("");
-  };
-
-  const handleItemFormCancel = () => {
-    setShowCreateItemForm(false);
-    setEditingItem(null);
-    setCurrentSectionForItem("");
-    setCurrentCategoryForItem("");
-  };
-
-  const publicMenuUrl =
-    origin && menu?.restaurant.slug && menu.slug
-      ? `${origin}/${menu.restaurant.slug}/${menu.slug}`
-      : "";
-
-  const handleCopyPublicLink = async () => {
-    if (!publicMenuUrl) return;
-
-    await navigator.clipboard.writeText(publicMenuUrl);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
-  };
-
-  if (loading) {
-    return <LoadingSpinner size="large" text="Loading menu..." fullScreen />;
-  }
-
-  if (error || !menu) {
-    return (
-      <div className="menu-management">
-        <div className="container">
-          <div className="menu-management__error">
-            <h2>Error</h2>
-            <p>{error || "Menu not found"}</p>
-            <button
-              className="btn-primary"
-              onClick={() => router.push("/user")}
-            >
-              Back to Dashboard
-            </button>
-          </div>
-        </div>
+  return <div className="menu-editor">
+    <div className="menu-editor__topbar"><div className="container"><Link href="/user"><ArrowLeft size={17} /> Dashboard</Link><span>MENU EDITOR</span></div></div>
+    <div className="container menu-editor__shell">
+      <div className="menu-editor__heading"><div><span className="menu-editor__eyebrow">{menu.restaurant.name} <ArrowRight size={13} /> Menu</span><h1>{menu.name}</h1><p>{menu.description || "Organize sections, categories and dishes in one place."}</p><div className="menu-editor__meta"><span className={menu.isActive ? "is-live" : ""}>{menu.isActive ? "Published" : "Draft"}</span><span>{menu.currency}</span><span>{sections.length} sections</span><span>{totalDishes} dishes</span></div></div>{publicUrl && <a className="menu-editor__preview" href={publicUrl} target="_blank" rel="noopener noreferrer">Preview menu <ArrowUpRight size={17} /></a>}</div>
+      {error && <div className="menu-editor__error" role="alert">{error}</div>}
+      <div className="menu-editor__workspace">
+        <aside className="menu-editor__sections"><div className="menu-editor__aside-heading"><div><span>STEP 1</span><h2>Sections</h2></div><button type="button" onClick={() => openSection()} aria-label="Add section"><Plus size={18} /></button></div><p>Group your menu by service or area.</p><div className="menu-editor__section-list">{sections.map((section) => <button type="button" className={activeSection?.name === section.name ? "is-active" : ""} key={section.name} onClick={() => { setSectionName(section.name); setCategoryName(""); }}><BookOpen size={18} /><span>{section.name}</span><small>{section.categories.length}</small></button>)}</div>{!sections.length && <div className="menu-editor__aside-empty">No sections yet.<button type="button" onClick={() => openSection()}><Plus size={15} /> Add first section</button></div>}</aside>
+        <div className="menu-editor__main">{activeSection ? <><div className="menu-editor__main-head"><div><span className="menu-editor__step">STEP 2 · SECTION</span><h2>{activeSection.name}</h2><p>{activeSection.description || "Choose a category to manage its dishes."}</p></div><div className="menu-editor__icon-actions"><button type="button" onClick={() => openSection(activeSection)} title="Edit section" aria-label="Edit section"><Pencil size={17} /></button><button type="button" onClick={() => remove("section", activeSection.name)} title="Delete section" aria-label="Delete section"><Trash2 size={17} /></button></div></div><div className="menu-editor__category-heading"><div><span className="menu-editor__step">STEP 3</span><h3>Categories</h3></div><button type="button" onClick={() => openCategory()}><Plus size={16} /> Add category</button></div>{categories.length ? <div className="menu-editor__category-tabs" role="tablist" aria-label="Categories">{categories.map((category) => <button type="button" role="tab" aria-selected={activeCategory?.name === category.name} className={activeCategory?.name === category.name ? "is-active" : ""} key={category.name} onClick={() => setCategoryName(category.name)}>{category.name}<span>{category.items.length}</span></button>)}</div> : <div className="menu-editor__inline-empty"><p>No categories in this section yet.</p><button type="button" onClick={() => openCategory()}><Plus size={16} /> Add category</button></div>}{activeCategory && <><div className="menu-editor__dishes-heading"><div><span className="menu-editor__step">STEP 4 · DISHES</span><h3>{activeCategory.name}</h3>{activeCategory.description && <p>{activeCategory.description}</p>}</div><div className="menu-editor__dishes-actions"><button type="button" onClick={() => openCategory(activeCategory)} title="Edit category" aria-label="Edit category"><Pencil size={17} /></button><button type="button" onClick={() => remove("category", activeCategory.name)} title="Delete category" aria-label="Delete category"><Trash2 size={17} /></button><button type="button" className="menu-editor__add-dish" onClick={() => openDish()}><Plus size={17} /> Add dish</button></div></div>{activeCategory.items.length ? <div className="menu-editor__dish-list">{activeCategory.items.map((dish) => <article className="menu-editor__dish" key={dish.name}><div className="menu-editor__dish-photo">{dish.images?.[0] ? <Image src={dish.images[0]} alt={dish.name} fill unoptimized sizes="70px" /> : <ImageIcon size={22} />}</div><div className="menu-editor__dish-info"><h4>{dish.name}</h4><p>{dish.description}</p><span className={dish.status === "available" ? "is-available" : ""}>{dish.status}</span></div><strong>{dish.price.toFixed(2)} {menu.currency}</strong><div className="menu-editor__icon-actions"><button type="button" onClick={() => openDish(dish)} title={`Edit ${dish.name}`} aria-label={`Edit ${dish.name}`}><Pencil size={17} /></button><button type="button" onClick={() => remove("dish", dish.name)} title={`Delete ${dish.name}`} aria-label={`Delete ${dish.name}`}><Trash2 size={17} /></button></div></article>)}</div> : <div className="menu-editor__inline-empty"><p>No dishes in this category yet.</p><button type="button" onClick={() => openDish()}><Plus size={16} /> Add first dish</button></div>}</>}</> : <div className="menu-editor__welcome"><BookOpen size={36} /><h2>Start with a section</h2><p>Sections hold categories, and categories hold dishes. Create the first section to begin.</p><button type="button" onClick={() => openSection()}><Plus size={17} /> Add section</button></div>}</div>
       </div>
-    );
-  }
-
-  return (
-    <div className="menu-management">
-      <div className="container">
-        {/* Header */}
-        <div className="menu-management__header">
-          <div className="menu-management__breadcrumb">
-            <button
-              className="menu-management__back-btn"
-              onClick={() => router.push("/user")}
-            >
-              ← Back to Dashboard
-            </button>
-          </div>
-
-          <div className="menu-management__title-section">
-            <h1>{menu.name}</h1>
-            <p className="menu-management__restaurant-name">
-              {menu.restaurant.name}
-            </p>
-            {menu.description && (
-              <p className="menu-management__description">{menu.description}</p>
-            )}
-          </div>
-
-          <div className="menu-management__meta">
-            <span
-              className={`menu-management__status ${
-                menu.isActive ? "active" : "inactive"
-              }`}
-            >
-              {menu.isActive ? "Active" : "Inactive"}
-            </span>
-            <span className="menu-management__currency">
-              Currency: {menu.currency}
-            </span>
-          </div>
-
-          {publicMenuUrl && (
-            <div className="menu-management__public">
-              <div className="menu-management__public-info">
-                <span className="menu-management__public-label">
-                  Public menu link
-                </span>
-                <a
-                  className="menu-management__public-url"
-                  href={publicMenuUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {publicMenuUrl}
-                </a>
-                <button
-                  className="menu-management__copy-btn"
-                  type="button"
-                  onClick={handleCopyPublicLink}
-                >
-                  {copied ? "Copied" : "Copy link"}
-                </button>
-              </div>
-              <div className="menu-management__qr">
-                <QrCode value={publicMenuUrl} size={152} />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="menu-management__content">
-          {showCreateSectionForm ? (
-            <CreateSectionForm
-              restaurantId={menu.restaurant._id}
-              menuName={menu.name}
-              onSubmit={
-                editingSection ? handleUpdateSection : handleCreateSection
-              }
-              onCancel={handleFormCancel}
-              editingSection={
-                editingSection
-                  ? {
-                      name: editingSection.name,
-                      description: editingSection.description || "",
-                      sortOrder: editingSection.sortOrder,
-                      originalName: editingSection.name,
-                    }
-                  : undefined
-              }
-            />
-          ) : showCreateCategoryForm ? (
-            <CreateCategoryForm
-              restaurantId={menu.restaurant._id}
-              menuName={menu.name}
-              sectionName={currentSectionForCategory}
-              onSubmit={
-                editingCategory ? handleUpdateCategory : handleCreateCategory
-              }
-              onCancel={handleCategoryFormCancel}
-              editingCategory={
-                editingCategory
-                  ? {
-                      name: editingCategory.name,
-                      description: editingCategory.description || "",
-                      sortOrder: editingCategory.sortOrder,
-                      originalName: editingCategory.name,
-                    }
-                  : undefined
-              }
-            />
-          ) : showCreateItemForm ? (
-            <CreateItemForm
-              restaurantId={menu.restaurant._id}
-              menuName={menu.name}
-              sectionName={currentSectionForItem}
-              categoryName={currentCategoryForItem}
-              onSubmit={editingItem ? handleUpdateItem : handleCreateItem}
-              onCancel={handleItemFormCancel}
-              editingItem={
-                editingItem
-                  ? {
-                      ...editingItem,
-                      originalName: editingItem.name,
-                    }
-                  : undefined
-              }
-            />
-          ) : (
-            <div className="menu-management__section">
-              <div className="menu-management__section-header">
-                <h2>Menu Sections</h2>
-                <button
-                  className="btn-primary"
-                  onClick={() => setShowCreateSectionForm(true)}
-                >
-                  Add Section
-                </button>
-              </div>
-
-              {menu.sections.length === 0 ? (
-                <div className="menu-management__empty">
-                  <div className="menu-management__empty-icon">🏗️</div>
-                  <h3>No sections yet</h3>
-                  <p>
-                    Start organizing your menu by adding sections like
-                    "Kitchen", "Bar", "Desserts", "Lunch Menu", etc.
-                  </p>
-                  <button
-                    className="btn-primary"
-                    onClick={() => setShowCreateSectionForm(true)}
-                  >
-                    Add First Section
-                  </button>
-                </div>
-              ) : (
-                <div className="menu-management__sections">
-                  {menu.sections
-                    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-                    .map((section) => (
-                      <SectionCard
-                        key={section.name}
-                        section={section}
-                        onEdit={handleEditSection}
-                        onDelete={handleDeleteSection}
-                        onAddCategory={handleAddCategory}
-                        onEditCategory={handleEditCategory}
-                        onDeleteCategory={handleDeleteCategory}
-                        onAddItem={handleAddItem}
-                        onEditItem={handleEditItem}
-                        onDeleteItem={handleDeleteItem}
-                      />
-                    ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+      {publicUrl && <div className="menu-editor__share"><div><QrIcon size={23} /><div><h3>Share this menu</h3><p>Print the QR code or share the public link with guests.</p><a href={publicUrl} target="_blank" rel="noopener noreferrer">{publicUrl}</a></div></div><div className="menu-editor__share-actions"><button type="button" onClick={async () => { await navigator.clipboard.writeText(publicUrl); setCopied(true); setTimeout(() => setCopied(false), 1600); }}><Copy size={16} /> {copied ? "Copied" : "Copy link"}</button><div className="menu-editor__qr"><QrCode value={publicUrl} size={86} /></div></div></div>}
     </div>
-  );
+    {dialog === "section" && <Modal title={editingSection ? "Edit section" : "Add section"} subtitle="Use sections for groups such as Kitchen, Bar or Breakfast." onClose={close} error={error}><CreateSectionForm key={editingSection?.name || "new"} restaurantId={context.restaurantId} menuName={context.menuName} onSubmit={saveSection} onCancel={close} editingSection={editingSection ? { name: editingSection.name, description: editingSection.description || "", sortOrder: editingSection.sortOrder } : undefined} /></Modal>}
+    {dialog === "category" && <Modal title={editingCategory ? "Edit category" : "Add category"} subtitle={`Organize dishes inside ${activeSection?.name}.`} onClose={close} error={error}><CreateCategoryForm key={editingCategory?.name || "new"} restaurantId={context.restaurantId} menuName={context.menuName} sectionName={activeSection.name} onSubmit={saveCategory} onCancel={close} editingCategory={editingCategory ? { name: editingCategory.name, description: editingCategory.description || "", sortOrder: editingCategory.sortOrder } : undefined} /></Modal>}
+    {dialog === "dish" && <Modal title={editingDish ? "Edit dish" : "Add dish"} subtitle={`${activeSection.name} / ${activeCategory.name}`} onClose={close} error={error} wide><CreateItemForm key={editingDish?.name || "new"} restaurantId={context.restaurantId} menuName={context.menuName} sectionName={activeSection.name} categoryName={activeCategory.name} onSubmit={saveDish} onCancel={close} editingItem={editingDish || undefined} /></Modal>}
+  </div>;
 }

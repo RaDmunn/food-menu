@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import "../styles/main.scss";
 
 export const metadata: Metadata = {
-  title: "FoodMenu - Online Restaurant Menus",
-  description:
-    "Discover the best restaurants, explore their menus, and leave reviews. Your gateway to culinary experiences.",
+  title: "FoodMenu | Digital menus for restaurants",
+  description: "Create and manage polished digital restaurant menus with QR access for every table.",
 };
 
 export default function RootLayout({

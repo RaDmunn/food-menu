@@ -11,10 +11,7 @@ export default function HomePage() {
     <>
       <Header />
       <Hero />
-      <WhyChooseUs
-      leftImg="/img/menu-simple.png"
-      rightImg="/img/menu-online.png"
-      />
+      <WhyChooseUs />
       <FeaturesSection />
       <Footer />
     </>

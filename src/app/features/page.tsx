@@ -10,8 +10,8 @@ export default function FeaturesPage() {
           <span className="simple-page__eyebrow">Features</span>
           <h1>Tools for modern digital menus</h1>
           <p>
-            Manage live menus, restaurant details, multilingual content, and
-            guest-facing updates from one focused platform.
+            Manage restaurants, menus, sections and dishes in one workspace.
+            Share each published menu through its link or QR code.
           </p>
         </div>
       </section>

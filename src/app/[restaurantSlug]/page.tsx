@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   MapPin,
   Phone,
@@ -202,7 +203,7 @@ export default function RestaurantPage() {
                     <span>{formatWorkingHours(restaurant.workingHours)}</span>
                   </div>
 
-                  {restaurant.averageRating && (
+                  {restaurant.averageRating !== undefined && restaurant.averageRating > 0 && (
                     <div className="restaurant-meta__item">
                       <Star size={18} />
                       <span>
@@ -258,12 +259,10 @@ export default function RestaurantPage() {
               {menus
                 .filter((menu) => menu.isActive)
                 .map((menu) => (
-                  <div
+                  <Link
                     key={menu._id}
                     className="menu-card"
-                    onClick={() =>
-                      router.push(`/${restaurantSlug}/${menu.slug}`)
-                    }
+                    href={`/${restaurantSlug}/${menu.slug}`}
                   >
                     <div className="menu-card__content">
                       <h3 className="menu-card__title">{menu.name}</h3>
@@ -279,7 +278,7 @@ export default function RestaurantPage() {
                         <span className="menu-card__cta">View Menu →</span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
             </div>
           </div>

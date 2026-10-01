@@ -8,14 +8,11 @@ export default function ContactPage() {
       <section className="simple-page">
         <div className="container">
           <span className="simple-page__eyebrow">Contact</span>
-          <h1>Contact DOMAIN</h1>
+          <h1>Contact FoodMenu</h1>
           <p>
-            Send a request and we will help you set up a clean digital menu for
-            your restaurant.
+            FoodMenu is currently a university project. Contact details for
+            commercial enquiries will be added before launch.
           </p>
-          <a className="simple-page__link" href="mailto:hello@domain.com">
-            hello@domain.com
-          </a>
         </div>
       </section>
       <Footer />
