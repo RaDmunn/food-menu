@@ -7,3 +7,8 @@
 @media (max-width: 600px) { .owner-app { &__page-heading { align-items: flex-start; flex-direction: column; } &__stats { grid-template-columns: 1fr 1fr; } &__menu-row { flex-wrap: wrap; } &__row-actions { width: 100%; justify-content: flex-end; } } .fm-modal { padding: 8px; &__panel { max-height: 98vh; } &__header { padding: 20px; } &__body { padding: 20px; } } .dish-form__row { grid-template-columns: 1fr; } .dish-form__photo { align-items: flex-start; flex-direction: column; } }
 .restaurant-form__optional { margin: 0 0 24px; border: 1px solid #dce5d8; border-radius: 5px; > summary { display: flex; align-items: center; gap: 9px; padding: 15px; color: $secondary-green; font-size: 13px; font-weight: 750; cursor: pointer; span { color: #7b8876; font-size: 12px; font-weight: 400; } } > .restaurant-form__section { padding: 20px !important; border-top: 1px solid #e6ebe3 !important; } }
 .fm-modal__error { margin: 0 0 17px; padding: 10px 13px; border: 1px solid #efc9bd; border-radius: 5px; background: #fff4ef; color: #9e4028; font-size: 13px; }
+
+@media (min-width: 851px) {
+  .owner-app { align-items: start; }
+  .owner-app__sidebar { position: sticky; top: 0; height: 100vh; min-height: 0; overflow-y: auto; }
+}
