@@ -1,11 +1,14 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import { existsSync } from "node:fs";
+import path from "node:path";
 
 dotenv.config({ path: ".env.local", quiet: true });
 if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI is missing from .env.local");
 
 const image = (name) => `/img/editorial/${name}.webp`;
-const dish = (name, description, price, photo, extra = {}) => ({ name, description, price, images: [image(photo)], status: "available", allergens: [], ingredients: [], ...extra });
+const dishImage = (name) => `/img/demo-dishes/${name.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.webp`;
+const dish = (name, description, price, _photo, extra = {}) => ({ name, description, price, images: [dishImage(name)], status: "available", allergens: [], ingredients: [], ...extra });
 const category = (name, items, sortOrder = 0) => ({ name, description: "", isActive: true, sortOrder, items });
 const section = (name, categories, sortOrder = 0) => ({ name, description: "", isActive: true, sortOrder, categories });
 const hours = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => ({ day, open: "09:00", close: "22:00", isClosed: false }));
@@ -126,6 +129,19 @@ for (const venue of venues) {
         targetSection.categories.push(targetCategory);
       }
       targetCategory.items.push(item);
+    }
+  }
+}
+
+for (const venue of venues) {
+  for (const menu of venue.menus) {
+    for (const menuSection of menu.sections) {
+      for (const menuCategory of menuSection.categories) {
+        for (const menuDish of menuCategory.items) {
+          const filePath = path.join(process.cwd(), "public", menuDish.images[0].slice(1));
+          if (!existsSync(filePath)) throw new Error(`Missing generated image for ${menuDish.name}: ${filePath}`);
+        }
+      }
     }
   }
 }

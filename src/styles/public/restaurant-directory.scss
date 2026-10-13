@@ -1,0 +1,25 @@
+@use "../_variables.scss" as *;
+
+.restaurant-directory { min-height: 65vh; background: #f5f2e9; color: $secondary-green; }
+.restaurant-directory .restaurant-directory__intro.container { padding-top: 110px; padding-bottom: 80px; }
+.restaurant-directory__intro h1 { max-width: 880px; margin: 18px 0; font: 400 clamp(58px,6vw,90px)/1.03 Georgia,serif; letter-spacing: -.06em; }
+.restaurant-directory__intro h1 em { color: $primary-orange-dark; font-weight: 400; }
+.restaurant-directory__intro p { max-width: 560px; margin: 0; color: #657160; font-size: 17px; line-height: 1.7; }
+.restaurant-directory .restaurant-directory__content.container { padding-bottom: 120px; }
+.restaurant-directory__grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 28px; }
+.restaurant-directory__card { overflow: hidden; background: white; color: $secondary-green; text-decoration: none; }
+.restaurant-directory__image { position: relative; height: 325px; background: #d8dfcf; overflow: hidden; }
+.restaurant-directory__image img { object-fit: cover; transition: transform .4s ease; }
+.restaurant-directory__card:hover img { transform: scale(1.03); }
+.restaurant-directory__card-body { display: flex; flex-direction: column; min-height: 245px; padding: 28px; }
+.restaurant-directory__meta { display: flex; justify-content: space-between; gap: 20px; color: $primary-orange-dark; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.restaurant-directory__card h2 { margin: 18px 0 10px; font: 400 36px/1.1 Georgia,serif; letter-spacing: -.04em; }
+.restaurant-directory__card p { max-width: 520px; margin: 0; color: #657160; font-size: 14px; line-height: 1.7; }
+.restaurant-directory__card-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-top: auto; padding-top: 28px; }
+.restaurant-directory__card-bottom span, .restaurant-directory__card-bottom strong { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; }
+.restaurant-directory__card-bottom span { color: #758170; }
+.restaurant-directory__card-bottom strong { border-bottom: 1px solid $secondary-green; padding-bottom: 6px; text-transform: uppercase; letter-spacing: .07em; }
+.restaurant-directory__message { padding: 40px 0; color: #657160; }
+@media (max-width: 750px) { .restaurant-directory .restaurant-directory__intro.container { padding-top: 75px; padding-bottom: 60px; } .restaurant-directory .restaurant-directory__content.container { padding-bottom: 80px; } .restaurant-directory__grid { grid-template-columns: 1fr; } .restaurant-directory__image { height: 260px; } }
+@media (max-width: 500px) { .restaurant-directory__intro h1 { font-size: 55px; } .restaurant-directory__card-body { min-height: 0; padding: 22px; } .restaurant-directory__card h2 { font-size: 30px; } }
+@media (prefers-reduced-motion: reduce) { .restaurant-directory__image img { transition: none; } }

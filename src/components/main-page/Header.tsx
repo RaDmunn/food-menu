@@ -16,7 +16,7 @@ export default function Header() {
         <nav className={`site-header__nav ${open ? "is-open" : ""}`} aria-label="Main navigation">
           <Link href="/#how-it-works" onClick={() => setOpen(false)}>The platform</Link>
           <Link href="/features" onClick={() => setOpen(false)}>Features</Link>
-          <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
+          <Link href="/restaurants" onClick={() => setOpen(false)}>Restaurants</Link>
         </nav>
         <Link href="/contact" className="site-header__cta">Request access <ArrowUpRight size={17} /></Link>
         <button className="site-header__menu" type="button" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open}>

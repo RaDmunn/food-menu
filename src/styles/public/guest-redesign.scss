@@ -19,3 +19,12 @@
 .menu-page .menu-header > .container { position: relative; z-index: 1; }
 .menu-page .menu-header__content { margin: 0; }
 .menu-page .menu-nav__list { padding-inline: 0; }
+.menu-page .menu-item__image { display: block; padding: 0; border: 0; cursor: zoom-in; }
+.menu-page .menu-item__image:focus-visible { outline: 3px solid $primary-orange; outline-offset: 3px; }
+.menu-photo-viewer { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px; background: rgba(13,21,11,.94); }
+.menu-photo-viewer__dialog { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.menu-photo-viewer__dialog img { display: block; max-width: min(100%, 1100px); max-height: calc(100dvh - 116px); width: auto; height: auto; object-fit: contain; border-radius: 3px; }
+.menu-photo-viewer__dialog p { max-width: 100%; margin: 13px 0 0; color: #fff; font-size: 14px; text-align: center; }
+.menu-photo-viewer__close { position: absolute; top: max(0px, env(safe-area-inset-top)); right: max(0px, env(safe-area-inset-right)); z-index: 1; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.4); border-radius: 50%; background: rgba(0,0,0,.4); color: #fff; cursor: pointer; }
+.menu-photo-viewer__close:focus-visible { outline: 3px solid $primary-orange; outline-offset: 3px; }
+@media (max-width: 650px) { .menu-photo-viewer { padding: 16px; } .menu-photo-viewer__dialog img { max-height: calc(100dvh - 120px); } }

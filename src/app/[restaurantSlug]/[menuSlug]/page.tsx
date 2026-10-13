@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -9,6 +9,7 @@ import {
   Leaf,
   Award,
   AlertTriangle,
+  X,
 } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Image from "next/image";
@@ -74,6 +75,9 @@ export default function MenuPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>("");
+  const [selectedPhoto, setSelectedPhoto] = useState<{ src: string; alt: string } | null>(null);
+  const photoTrigger = useRef<HTMLButtonElement | null>(null);
+  const closePhotoButton = useRef<HTMLButtonElement | null>(null);
 
   const restaurantSlug = params.restaurantSlug as string;
   const menuSlug = params.menuSlug as string;
@@ -131,6 +135,26 @@ export default function MenuPage() {
       fetchMenu();
     }
   }, [restaurantSlug, menuSlug]);
+
+  useEffect(() => {
+    if (!selectedPhoto) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closePhotoButton.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedPhoto(null);
+      if (event.key === "Tab") {
+        event.preventDefault();
+        closePhotoButton.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      photoTrigger.current?.focus();
+    };
+  }, [selectedPhoto]);
 
   const getDietaryIcons = (item: MenuItem) => {
     const icons = [];
@@ -370,9 +394,9 @@ export default function MenuPage() {
                             </div>
 
                             {item.images && item.images[0] && (
-                              <div className="menu-item__image">
+                              <button type="button" className="menu-item__image" onClick={(event) => { photoTrigger.current = event.currentTarget; setSelectedPhoto({ src: item.images![0], alt: item.name }); }} aria-label={`View photo of ${item.name}`}>
                                 <img src={item.images[0]} alt={item.name} />
-                              </div>
+                              </button>
                             )}
                           </div>
                         ))}
@@ -383,6 +407,13 @@ export default function MenuPage() {
           ))}
         </div>
       </main>
+      {selectedPhoto && <div className="menu-photo-viewer" role="presentation" onClick={(event) => { if (event.currentTarget === event.target) setSelectedPhoto(null); }}>
+        <div className="menu-photo-viewer__dialog" role="dialog" aria-modal="true" aria-label={`Photo of ${selectedPhoto.alt}`} onClick={(event) => { if (event.currentTarget === event.target) setSelectedPhoto(null); }}>
+          <button ref={closePhotoButton} type="button" className="menu-photo-viewer__close" onClick={() => setSelectedPhoto(null)} aria-label="Close photo"><X size={24} /></button>
+          <img src={selectedPhoto.src} alt={selectedPhoto.alt} />
+          <p>{selectedPhoto.alt}</p>
+        </div>
+      </div>}
     </div>
   );
 }

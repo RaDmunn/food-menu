@@ -9,6 +9,7 @@ Copy any URL below into a browser:
 ```text
 http://localhost:3000/
 http://localhost:3000/features
+http://localhost:3000/restaurants
 http://localhost:3000/contact
 http://localhost:3000/auth
 http://localhost:3000/user
