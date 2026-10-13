@@ -136,6 +136,7 @@ export interface IMenu extends Document {
   name: string; // Menu name (e.g., "Breakfast Menu", "Dinner Menu", "Wine List")
   slug: string; // URL-friendly название для ссылок
   description?: string; // Optional menu description
+  coverImage?: string;
   currency: string;
   sections: IMenuSection[]; // Changed from categories to sections
   isActive: boolean;
@@ -509,6 +510,11 @@ const MenuSchema = new Schema<IMenu>(
       type: String,
       trim: true,
       maxlength: [500, "Menu description cannot exceed 500 characters"],
+    },
+    coverImage: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Menu cover URL cannot exceed 500 characters"],
     },
     currency: {
       type: String,

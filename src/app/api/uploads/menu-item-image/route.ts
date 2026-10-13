@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file");
     const restaurantId = formData.get("restaurantId");
+    const kind = formData.get("kind") === "cover" ? "menu-covers" : formData.get("kind") === "restaurant" ? "restaurants" : "menu-items";
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "Image file is required" }, { status: 400 });
@@ -63,13 +64,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "menu-items");
+    const uploadDir = path.join(process.cwd(), "public", "uploads", kind);
     await mkdir(uploadDir, { recursive: true });
 
     const fileName = `${randomUUID()}.${extension}`;
     await writeFile(path.join(uploadDir, fileName), bytes);
 
-    return NextResponse.json({ url: `/uploads/menu-items/${fileName}` });
+    return NextResponse.json({ url: `/uploads/${kind}/${fileName}` });
   } catch (error: unknown) {
     console.error("Upload menu item image error:", error);
     const errorMessage =

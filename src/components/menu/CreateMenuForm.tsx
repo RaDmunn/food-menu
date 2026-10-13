@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ChangeEvent } from "react";
+import Image from "next/image";
+import { ImagePlus, X } from "lucide-react";
 
 export interface MenuFormData {
   name: string;
   description: string;
+  coverImage: string;
   currency: string;
   isActive: boolean;
 }
@@ -27,6 +30,7 @@ interface Menu {
   _id: string;
   name: string;
   description: string;
+  coverImage?: string;
   currency: string;
   isActive: boolean;
   restaurant: {
@@ -59,6 +63,7 @@ export default function CreateMenuForm({
   const [formData, setFormData] = useState<MenuFormData>({
     name: editingMenu?.name || "",
     description: editingMenu?.description || "",
+    coverImage: editingMenu?.coverImage || "",
     currency: editingMenu?.currency || "EUR",
     isActive: editingMenu?.isActive ?? true,
   });
@@ -70,6 +75,8 @@ export default function CreateMenuForm({
   );
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [isRestaurantSelectOpen, setIsRestaurantSelectOpen] = useState(false);
   const restaurantSelectRef = useRef<HTMLDivElement>(null);
 
@@ -113,6 +120,28 @@ export default function CreateMenuForm({
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const uploadCover = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !selectedRestaurant) return;
+    setUploading(true);
+    setUploadError("");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      body.append("restaurantId", selectedRestaurant);
+      body.append("kind", "cover");
+      const response = await fetch("/api/uploads/menu-item-image", { method: "POST", body });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Cover upload failed.");
+      setFormData((previous) => ({ ...previous, coverImage: result.url }));
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Cover upload failed.");
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -241,6 +270,15 @@ export default function CreateMenuForm({
         </div>
 
         <div className="create-menu-form__field">
+          <span className="create-menu-form__label">Menu cover photo</span>
+          <div className="create-menu-form__cover">
+            {formData.coverImage ? <div className="create-menu-form__cover-preview"><Image src={formData.coverImage} alt="Menu cover preview" fill unoptimized sizes="160px" /><button type="button" onClick={() => setFormData((previous) => ({ ...previous, coverImage: "" }))} aria-label="Remove cover"><X size={16} /></button></div> : <div className="create-menu-form__cover-placeholder"><ImagePlus size={24} /></div>}
+            <div><p>Shown on the restaurant page and behind the menu title. JPG, PNG or WEBP, up to 5 MB.</p><label className="create-menu-form__cover-upload">{uploading ? "Uploading…" : formData.coverImage ? "Change photo" : "Upload photo"}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadCover} disabled={uploading || !selectedRestaurant} hidden /></label></div>
+          </div>
+          {uploadError && <span className="create-menu-form__error" role="alert">{uploadError}</span>}
+        </div>
+
+        <div className="create-menu-form__field">
           <label className="create-menu-form__label">Currency *</label>
           <select
             className={`create-menu-form__select ${
@@ -285,7 +323,7 @@ export default function CreateMenuForm({
           <button
             type="submit"
             className="create-menu-form__submit-btn"
-            disabled={loading || !formData.name.trim() || !selectedRestaurant}
+            disabled={loading || uploading || !formData.name.trim() || !selectedRestaurant}
           >
             {loading
               ? editingMenu

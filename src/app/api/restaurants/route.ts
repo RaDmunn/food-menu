@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       description,
+      images,
       address,
       contact,
       cuisineType,
@@ -109,6 +110,7 @@ export async function POST(request: NextRequest) {
     const restaurant = new Restaurant({
       name,
       description,
+      images: images || [],
       owner: user._id,
       address,
       contact,

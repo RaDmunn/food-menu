@@ -85,9 +85,10 @@ export async function PUT(
     }
 
     // Only allow safe fields — prevents client from overwriting restaurant ref or other system fields
-    const { name, description, currency, isActive, sections } = body;
+    const { name, description, coverImage, currency, isActive, sections } = body;
     if (name !== undefined) menu.name = name;
     if (description !== undefined) menu.description = description;
+    if (coverImage !== undefined) menu.coverImage = coverImage;
     if (currency !== undefined) menu.currency = currency;
     if (isActive !== undefined) menu.isActive = isActive;
     if (sections !== undefined) menu.sections = sections;

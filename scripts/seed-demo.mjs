@@ -52,6 +52,84 @@ const venues = [
   },
 ];
 
+// Keep the demo collections substantial enough to exercise the guest menu layout.
+const additions = {
+  "spring-menu": [
+    ["Food", "Vegetables", dish("Whipped ricotta & greens", "Warm seasonal vegetables, whipped ricotta and herbs.", 11, "vegetables", { isVegetarian: true, allergens: ["Dairy"] })],
+    ["Food", "Vegetables", dish("Garden plate", "Roasted roots, leafy greens and toasted seeds.", 10, "vegetables", { isVegan: true })],
+    ["Food", "Pasta", dish("Wild mushroom pappardelle", "Slow-cooked mushrooms and aged parmesan.", 17, "bistro-table", { allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Pasta", dish("Herb butter tagliatelle", "Fresh ribbons of pasta, herbs and parmesan.", 14, "bistro-table", { allergens: ["Gluten", "Dairy"], isVegetarian: true })],
+    ["Food", "Dessert", dish("Lemon tart slice", "Crisp pastry, lemon curd and soft meringue.", 8, "tart", { allergens: ["Gluten", "Eggs", "Dairy"] })],
+    ["Drinks", "Wine", dish("House white", "A crisp, citrus-led white by the glass.", 7, "wine-board", { containsAlcohol: true })],
+    ["Drinks", "Coffee", dish("Espresso", "A rich, short coffee.", 3, "croissant")],
+    ["Drinks", "Coffee", dish("Cappuccino", "Espresso with silky steamed milk.", 5, "croissant", { allergens: ["Dairy"] })],
+  ],
+  "summer-menu": [
+    ["Food", "To share", dish("Artisan cheese board", "A selection of cheeses with grapes and olives.", 16, "wine-board", { allergens: ["Dairy"] })],
+    ["Food", "To share", dish("Warm vegetable platter", "Seasonal vegetables with herbed ricotta.", 12, "vegetables", { isVegetarian: true, allergens: ["Dairy"] })],
+    ["Food", "Pizza", dish("Garden pizza", "Tomato, mozzarella and roasted vegetables.", 16, "pizza", { isVegetarian: true, allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Pizza", dish("Basil & mozzarella pizza", "Slow tomato sauce, basil and fresh mozzarella.", 15, "pizza", { isVegetarian: true, allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Pasta", dish("Parmesan mushroom pasta", "Fresh pasta in a creamy mushroom sauce.", 17, "bistro-table", { allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Dessert", dish("Lemon meringue tart", "A bright finish with toasted meringue.", 8, "tart", { allergens: ["Gluten", "Eggs", "Dairy"] })],
+    ["Drinks", "Wine", dish("House white", "Fresh and dry, served by the glass.", 7, "wine-board", { containsAlcohol: true })],
+    ["Drinks", "Coffee", dish("Cappuccino", "Double espresso and steamed milk.", 5, "croissant", { allergens: ["Dairy"] })],
+  ],
+  "spring-breakfast": [
+    ["Food", "Pastries", dish("Almond croissant", "A flaky morning pastry with almond filling.", 5, "croissant", { allergens: ["Gluten", "Dairy", "Nuts"] })],
+    ["Food", "Pastries", dish("Warm pastry basket", "A selection of freshly baked croissants.", 10, "croissant", { allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Brunch plates", dish("Roasted garden plate", "Vegetables, herbs and a spoon of ricotta.", 13, "vegetables", { isVegetarian: true, allergens: ["Dairy"] })],
+    ["Food", "Brunch plates", dish("Mushroom brunch pasta", "Fresh pasta with mushrooms and parmesan.", 15, "bistro-table", { allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Sweet counter", dish("Lemon tart slice", "Lemon curd and toasted meringue.", 7, "tart", { allergens: ["Gluten", "Eggs", "Dairy"] })],
+    ["Drinks", "Coffee", dish("Espresso", "A short, balanced coffee.", 3, "croissant")],
+    ["Drinks", "Coffee", dish("Flat white", "Double espresso with textured milk.", 5, "croissant", { allergens: ["Dairy"] })],
+    ["Drinks", "Coffee", dish("Latte", "Espresso with steamed milk.", 5, "croissant", { allergens: ["Dairy"] })],
+  ],
+  "weekend-specials": [
+    ["Food", "Bakery", dish("Almond croissant", "A crisp pastry with almond filling.", 5, "croissant", { allergens: ["Gluten", "Dairy", "Nuts"] })],
+    ["Food", "Bakery", dish("Croissant basket", "Three warm, butter-rich pastries to share.", 11, "croissant", { allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Cake counter", dish("Lemon tart slice", "A smaller slice for the afternoon.", 6, "tart", { allergens: ["Gluten", "Eggs", "Dairy"] })],
+    ["Food", "Brunch plates", dish("Ricotta & roasted vegetables", "A colourful plate with fresh herbs.", 13, "vegetables", { isVegetarian: true, allergens: ["Dairy"] })],
+    ["Food", "Brunch plates", dish("Mushroom tagliatelle", "Fresh pasta, mushrooms and parmesan.", 15, "bistro-table", { allergens: ["Gluten", "Dairy"] })],
+    ["Drinks", "Coffee", dish("Espresso", "Our short house coffee.", 3, "croissant")],
+    ["Drinks", "Coffee", dish("Flat white", "Double espresso and silky milk.", 5, "croissant", { allergens: ["Dairy"] })],
+    ["Drinks", "Coffee", dish("Latte", "A gentle milk coffee.", 5, "croissant", { allergens: ["Dairy"] })],
+  ],
+  "autumn-tasting": [
+    ["Food", "Boards", dish("Artisan cheese selection", "Three cheeses, fruit and crisp bread.", 16, "wine-board", { allergens: ["Dairy", "Gluten"] })],
+    ["Food", "Boards", dish("Cured meats & olives", "A generous plate for the table.", 17, "wine-board")],
+    ["Food", "Warm plates", dish("Parmesan mushroom pasta", "Fresh pasta with mushrooms and aged cheese.", 17, "bistro-table", { allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Warm plates", dish("Garden vegetable plate", "Warm roots, herbs and toasted seeds.", 11, "vegetables", { isVegan: true })],
+    ["Food", "Dessert", dish("Lemon meringue tart", "Bright citrus and crisp pastry.", 8, "tart", { allergens: ["Gluten", "Eggs", "Dairy"] })],
+    ["Drinks", "By the glass", dish("House white", "A lively, dry white wine.", 8, "wine-board", { containsAlcohol: true })],
+    ["Drinks", "By the glass", dish("House rosé", "Light and fruit-forward.", 8, "wine-board", { containsAlcohol: true })],
+    ["Drinks", "Coffee", dish("Espresso", "A short coffee after dinner.", 3, "croissant")],
+  ],
+  "summer-evenings": [
+    ["Food", "To share", dish("Cheese selection", "Artisan cheeses with fruit and olives.", 16, "wine-board", { allergens: ["Dairy"] })],
+    ["Food", "To share", dish("Roasted vegetable board", "Warm vegetables and herbed ricotta.", 12, "vegetables", { isVegetarian: true, allergens: ["Dairy"] })],
+    ["Food", "From the kitchen", dish("Garden pizza", "Mozzarella, basil and roasted vegetables.", 16, "pizza", { allergens: ["Gluten", "Dairy"], isVegetarian: true })],
+    ["Food", "From the kitchen", dish("Mushroom tagliatelle", "Wild mushrooms and parmesan.", 17, "bistro-table", { allergens: ["Gluten", "Dairy"] })],
+    ["Food", "Dessert", dish("Lemon tart", "Crisp pastry with lemon and meringue.", 8, "tart", { allergens: ["Gluten", "Eggs", "Dairy"] })],
+    ["Drinks", "Wine", dish("House white", "A crisp white by the glass.", 8, "wine-board", { containsAlcohol: true })],
+    ["Drinks", "Wine", dish("House rosé", "A light, refreshing rosé.", 8, "wine-board", { containsAlcohol: true })],
+    ["Drinks", "Coffee", dish("Espresso", "A short coffee to finish.", 3, "croissant")],
+  ],
+};
+
+for (const venue of venues) {
+  for (const menu of venue.menus) {
+    for (const [sectionName, categoryName, item] of additions[menu.slug] || []) {
+      const targetSection = menu.sections.find((entry) => entry.name === sectionName);
+      let targetCategory = targetSection.categories.find((entry) => entry.name === categoryName);
+      if (!targetCategory) {
+        targetCategory = category(categoryName, [], targetSection.categories.length);
+        targetSection.categories.push(targetCategory);
+      }
+      targetCategory.items.push(item);
+    }
+  }
+}
+
 await mongoose.connect(process.env.MONGODB_URI);
 try {
   const db = mongoose.connection.db;
@@ -73,7 +151,8 @@ try {
     for (const menu of menus) {
       const { oldSlug, ...menuFields } = menu;
       const filter = { restaurant: saved._id, slug: refresh ? { $in: [oldSlug, menu.slug] } : menu.slug };
-      const values = { ...menuFields, restaurant: saved._id, currency: "EUR", isActive: true, lastUpdated: new Date(), updatedAt: new Date() };
+      const coverImages = { "spring-menu": "vegetables", "summer-menu": "pizza", "spring-breakfast": "croissant", "weekend-specials": "tart", "autumn-tasting": "wine-board", "summer-evenings": "wine-board" };
+      const values = { ...menuFields, restaurant: saved._id, coverImage: image(coverImages[menu.slug] || venueImage), currency: "EUR", isActive: true, lastUpdated: new Date(), updatedAt: new Date() };
       const result = await db.collection("menus").updateOne(filter, refresh ? { $set: values, $setOnInsert: { createdAt: new Date() } } : { $setOnInsert: { ...values, createdAt: new Date() } }, { upsert: true });
       if (result.upsertedCount) createdMenus++;
     }

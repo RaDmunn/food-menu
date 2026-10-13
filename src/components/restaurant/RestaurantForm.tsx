@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ChangeEvent } from "react";
+import Image from "next/image";
+import { ImagePlus, X } from "lucide-react";
 import { CuisineType } from "@/lib/types";
 
 export interface RestaurantFormData {
   name: string;
   description: string;
+  images?: string[];
   cuisineType: CuisineType[];
   address: {
     street: string;
@@ -166,6 +169,7 @@ interface RestaurantFormProps {
   loading?: boolean;
   initialData?: Partial<RestaurantFormData>;
   isEditing?: boolean;
+  restaurantId?: string;
 }
 
 const DAYS_OF_WEEK = [
@@ -273,10 +277,12 @@ export default function RestaurantForm({
   loading = false,
   initialData,
   isEditing = false,
+  restaurantId,
 }: RestaurantFormProps) {
   const [formData, setFormData] = useState<RestaurantFormData>({
     name: initialData?.name || "",
     description: initialData?.description || "",
+    images: initialData?.images || [],
     cuisineType: initialData?.cuisineType || [],
     address: {
       street: initialData?.address?.street || "",
@@ -312,6 +318,30 @@ export default function RestaurantForm({
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const uploadHero = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !restaurantId) return;
+    setUploading(true);
+    setUploadError("");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      body.append("restaurantId", restaurantId);
+      body.append("kind", "restaurant");
+      const response = await fetch("/api/uploads/menu-item-image", { method: "POST", body });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Photo upload failed.");
+      setFormData((previous) => ({ ...previous, images: [result.url, ...(previous.images || []).slice(1)] }));
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Photo upload failed.");
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  };
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
@@ -431,6 +461,15 @@ export default function RestaurantForm({
             placeholder="Describe your restaurant"
             rows={3}
           />
+        </div>
+
+        <div className="restaurant-form__field">
+          <span className="restaurant-form__label">Restaurant hero photo</span>
+          <div className="restaurant-form__hero-upload">
+            {formData.images?.[0] ? <div className="restaurant-form__hero-preview"><Image src={formData.images[0]} alt="Restaurant hero preview" fill unoptimized sizes="160px" /><button type="button" onClick={() => setFormData((previous) => ({ ...previous, images: [] }))} aria-label="Remove photo"><X size={16} /></button></div> : <div className="restaurant-form__hero-placeholder"><ImagePlus size={24} /></div>}
+            <div><p>{restaurantId ? "Shown at the top of your public restaurant page. JPG, PNG or WEBP, up to 5 MB." : "Save the restaurant first, then edit it to add a hero photo."}</p>{restaurantId && <label className="restaurant-form__hero-upload-button">{uploading ? "Uploading…" : formData.images?.[0] ? "Change photo" : "Upload photo"}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadHero} disabled={uploading} hidden /></label>}</div>
+          </div>
+          {uploadError && <span className="restaurant-form__error" role="alert">{uploadError}</span>}
         </div>
 
         <div className="restaurant-form__field">
@@ -849,7 +888,7 @@ export default function RestaurantForm({
           type="submit"
           className="restaurant-form__submit-btn"
           disabled={
-            loading || !formData.name || formData.cuisineType.length === 0
+            loading || uploading || !formData.name || formData.cuisineType.length === 0
           }
         >
           {loading

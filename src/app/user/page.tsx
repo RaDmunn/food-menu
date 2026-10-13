@@ -22,6 +22,7 @@ interface Menu {
   _id: string;
   name: string;
   description: string;
+  coverImage?: string;
   currency: string;
   isActive: boolean;
   restaurant: { _id: string; name: string };
@@ -127,7 +128,7 @@ export default function UserPage() {
         {view === "account" && <><div className="owner-app__page-heading"><div><span className="owner-app__eyebrow">PROFILE</span><h1>Account</h1><p>Your owner account details.</p></div></div><div className="owner-app__account"><div><span>Name</span><strong>{user?.name}</strong></div><div><span>Email</span><strong>{user?.email}</strong></div><div><span>Role</span><strong>Restaurant owner</strong></div></div></>}
       </div>
     </main>
-    {modal === "restaurant" && <Modal title={editingRestaurant ? "Edit restaurant" : "Add restaurant"} subtitle="Start with the essentials. You can update these details later." onClose={closeModal} wide><>{error && <div className="owner-app__error" role="alert">{error}</div>}<RestaurantForm key={editingRestaurant?._id || "new"} onSubmit={saveRestaurant} loading={busy} isEditing={!!editingRestaurant} initialData={editingRestaurant || undefined} /></></Modal>}
+    {modal === "restaurant" && <Modal title={editingRestaurant ? "Edit restaurant" : "Add restaurant"} subtitle="Start with the essentials. You can update these details later." onClose={closeModal} wide><>{error && <div className="owner-app__error" role="alert">{error}</div>}<RestaurantForm key={editingRestaurant?._id || "new"} onSubmit={saveRestaurant} loading={busy} isEditing={!!editingRestaurant} restaurantId={editingRestaurant?._id} initialData={editingRestaurant || undefined} /></></Modal>}
     {modal === "menu" && <Modal title={editingMenu ? "Edit menu" : "Create menu"} subtitle="Name a seasonal or special menu and choose its restaurant." onClose={closeModal}><>{error && <div className="owner-app__error" role="alert">{error}</div>}<CreateMenuForm key={editingMenu?._id || selectedRestaurantId} restaurants={restaurants} selectedRestaurantId={selectedRestaurantId === "all" ? restaurants[0]?._id : selectedRestaurantId} editingMenu={editingMenu} onSubmit={saveMenu} onCancel={closeModal} loading={busy} /></></Modal>}
   </div>;
 }

@@ -335,3 +335,12 @@
     transform: translateY(0);
   }
 }
+
+.create-menu-form__cover { display: flex; align-items: center; gap: 18px; padding: 15px; border: 1px solid #d4ddd0; border-radius: 5px; background: #f7f8f5; }
+.create-menu-form__cover-preview, .create-menu-form__cover-placeholder { position: relative; flex: none; width: 132px; height: 86px; overflow: hidden; border-radius: 4px; background: #e4eadd; }
+.create-menu-form__cover-preview img { object-fit: cover; }
+.create-menu-form__cover-preview button { position: absolute; top: 5px; right: 5px; display: grid; place-items: center; width: 25px; height: 25px; border: 0; border-radius: 3px; background: white; color: #234018; cursor: pointer; }
+.create-menu-form__cover-placeholder { display: grid; place-items: center; color: #84977b; }
+.create-menu-form__cover p { margin: 0 0 9px; color: #657361; font-size: 12px; line-height: 1.5; }
+.create-menu-form__cover-upload { color: #29491c; font-size: 12px; font-weight: 750; text-decoration: underline; cursor: pointer; }
+@media (max-width: 480px) { .create-menu-form__cover { align-items: flex-start; flex-direction: column; } }

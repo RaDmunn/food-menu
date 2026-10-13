@@ -11,12 +11,13 @@ import QrCode from "@/components/ui/QrCode";
 import CreateSectionForm, { type SectionFormData } from "@/components/menu/CreateSectionForm";
 import CreateCategoryForm, { type CategoryFormData } from "@/components/menu/CreateCategoryForm";
 import CreateItemForm, { type ItemFormData } from "@/components/menu/CreateItemForm";
+import CreateMenuForm, { type MenuFormData } from "@/components/menu/CreateMenuForm";
 
 interface Dish extends ItemFormData { status: string; }
 interface Category { name: string; description?: string; sortOrder?: number; items: Dish[]; }
 interface Section { name: string; description?: string; sortOrder?: number; categories: Category[]; }
-interface MenuData { _id: string; name: string; slug: string; description?: string; currency: string; isActive: boolean; restaurant: { _id: string; name: string; slug: string }; sections: Section[]; }
-type Dialog = "section" | "category" | "dish" | null;
+interface MenuData { _id: string; name: string; slug: string; description?: string; coverImage?: string; currency: string; isActive: boolean; restaurant: { _id: string; name: string; slug: string }; sections: Section[]; }
+type Dialog = "menu" | "section" | "category" | "dish" | null;
 
 export default function MenuManagementPage() {
   const router = useRouter();
@@ -81,6 +82,10 @@ export default function MenuManagementPage() {
       : { ...context, sectionName: activeSection.name, categoryName: activeCategory.name, ...data });
     close();
   };
+  const saveMenuDetails = async (data: MenuFormData) => {
+    await request(`/api/menu/${menuId}`, "PUT", data);
+    close();
+  };
   const remove = async (kind: "section" | "category" | "dish", name: string) => {
     const message = kind === "section" ? `Delete “${name}” and all its categories and dishes?` : kind === "category" ? `Delete “${name}” and all its dishes?` : `Delete “${name}”?`;
     if (!window.confirm(message)) return;
@@ -106,7 +111,7 @@ export default function MenuManagementPage() {
   return <div className="menu-editor">
     <div className="menu-editor__topbar"><div className="container"><Link href="/user"><ArrowLeft size={17} /> Dashboard</Link><span>MENU EDITOR</span></div></div>
     <div className="container menu-editor__shell">
-      <div className="menu-editor__heading"><div><span className="menu-editor__eyebrow">{menu.restaurant.name} <ArrowRight size={13} /> Menu</span><h1>{menu.name}</h1><p>{menu.description || "Organize sections, categories and dishes in one place."}</p><div className="menu-editor__meta"><span className={menu.isActive ? "is-live" : ""}>{menu.isActive ? "Published" : "Draft"}</span><span>{menu.currency}</span><span>{sections.length} sections</span><span>{totalDishes} dishes</span></div></div>{publicUrl && <a className="menu-editor__preview" href={publicUrl} target="_blank" rel="noopener noreferrer">Preview menu <ArrowUpRight size={17} /></a>}</div>
+      <div className="menu-editor__heading"><div><span className="menu-editor__eyebrow">{menu.restaurant.name} <ArrowRight size={13} /> Menu</span><h1>{menu.name}</h1><p>{menu.description || "Organize sections, categories and dishes in one place."}</p><div className="menu-editor__meta"><span className={menu.isActive ? "is-live" : ""}>{menu.isActive ? "Published" : "Draft"}</span><span>{menu.currency}</span><span>{sections.length} sections</span><span>{totalDishes} dishes</span></div></div><div className="menu-editor__heading-actions"><button type="button" onClick={() => setDialog("menu")}><Pencil size={16} /> Edit menu details</button>{publicUrl && <a className="menu-editor__preview" href={publicUrl} target="_blank" rel="noopener noreferrer">Preview menu <ArrowUpRight size={17} /></a>}</div></div>
       {error && <div className="menu-editor__error" role="alert">{error}</div>}
       <div className="menu-editor__workspace">
         <aside className="menu-editor__sections"><div className="menu-editor__aside-heading"><div><span>STEP 1</span><h2>Sections</h2></div><button type="button" onClick={() => openSection()} aria-label="Add section"><Plus size={18} /></button></div><p>Separate food and drinks within this menu.</p><div className="menu-editor__section-list">{sections.map((section) => <button type="button" className={activeSection?.name === section.name ? "is-active" : ""} key={section.name} onClick={() => { setSectionName(section.name); setCategoryName(""); }}><BookOpen size={18} /><span>{section.name}</span><small>{section.categories.length}</small></button>)}</div>{!sections.length && <div className="menu-editor__aside-empty">No sections yet.<button type="button" onClick={() => openSection()}><Plus size={15} /> Add first section</button></div>}</aside>
@@ -114,6 +119,7 @@ export default function MenuManagementPage() {
       </div>
       {publicUrl && <div className="menu-editor__share"><div><QrIcon size={23} /><div><h3>Share this menu</h3><p>Print the QR code or share the public link with guests.</p><a href={publicUrl} target="_blank" rel="noopener noreferrer">{publicUrl}</a></div></div><div className="menu-editor__share-actions"><button type="button" onClick={async () => { await navigator.clipboard.writeText(publicUrl); setCopied(true); setTimeout(() => setCopied(false), 1600); }}><Copy size={16} /> {copied ? "Copied" : "Copy link"}</button><div className="menu-editor__qr"><QrCode value={publicUrl} size={86} /></div></div></div>}
     </div>
+    {dialog === "menu" && <Modal title="Edit menu details" subtitle="Change the title, description and cover photo guests see." onClose={close} error={error}><CreateMenuForm restaurants={[menu.restaurant]} selectedRestaurantId={menu.restaurant._id} editingMenu={{ ...menu, description: menu.description || "" }} onSubmit={saveMenuDetails} onCancel={close} /></Modal>}
     {dialog === "section" && <Modal title={editingSection ? "Edit section" : "Add section"} subtitle="Use sections for Food and Drinks; add Pasta, Pizza or Cocktails as categories." onClose={close} error={error}><CreateSectionForm key={editingSection?.name || "new"} restaurantId={context.restaurantId} menuName={context.menuName} onSubmit={saveSection} onCancel={close} editingSection={editingSection ? { name: editingSection.name, description: editingSection.description || "", sortOrder: editingSection.sortOrder } : undefined} /></Modal>}
     {dialog === "category" && <Modal title={editingCategory ? "Edit category" : "Add category"} subtitle={`Organize dishes inside ${activeSection?.name}.`} onClose={close} error={error}><CreateCategoryForm key={editingCategory?.name || "new"} restaurantId={context.restaurantId} menuName={context.menuName} sectionName={activeSection.name} onSubmit={saveCategory} onCancel={close} editingCategory={editingCategory ? { name: editingCategory.name, description: editingCategory.description || "", sortOrder: editingCategory.sortOrder } : undefined} /></Modal>}
     {dialog === "dish" && <Modal title={editingDish ? "Edit dish" : "Add dish"} subtitle={`${activeSection.name} / ${activeCategory.name}`} onClose={close} error={error} wide><CreateItemForm key={editingDish?.name || "new"} restaurantId={context.restaurantId} menuName={context.menuName} sectionName={activeSection.name} categoryName={activeCategory.name} onSubmit={saveDish} onCancel={close} editingItem={editingDish || undefined} /></Modal>}

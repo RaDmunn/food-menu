@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log("Received menu data:", body);
 
-    const { restaurantId, name, description, currency, isActive = true } = body;
+    const { restaurantId, name, description, coverImage, currency, isActive = true } = body;
 
     // Валидация обязательных полей
     if (!restaurantId || !name) {
@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
       restaurant: restaurantId,
       name,
       description: description || "",
+      coverImage: coverImage || "",
       currency: currency || "EUR",
       sections: [],
       isActive,

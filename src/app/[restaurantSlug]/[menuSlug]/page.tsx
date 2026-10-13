@@ -11,6 +11,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Image from "next/image";
 
 interface MenuItem {
   name: string;
@@ -55,6 +56,7 @@ interface Menu {
   name: string;
   slug: string;
   description?: string;
+  coverImage?: string;
   currency: string;
   restaurant: {
     _id: string;
@@ -217,8 +219,8 @@ export default function MenuPage() {
 
   return (
     <div className="menu-page">
-      {/* Header */}
-      <header className="menu-header">
+      <header className={`menu-header${menu.coverImage ? " menu-header--image" : ""}`}>
+        {menu.coverImage && <div className="menu-header__photo"><Image src={menu.coverImage} alt="" fill priority sizes="100vw" /></div>}
         <div className="container">
           <button
             className="back-button"
@@ -233,12 +235,6 @@ export default function MenuPage() {
             {menu.description && (
               <p className="menu-header__description">{menu.description}</p>
             )}
-            <div className="menu-header__meta">
-              <span className="restaurant-name">{menu.restaurant.name}</span>
-              <span className="currency-info">
-                All prices in {menu.currency}
-              </span>
-            </div>
           </div>
         </div>
       </header>
